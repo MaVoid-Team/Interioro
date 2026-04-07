@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "@/i18n/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from "@/context/AuthContext"
 import { useUser, Address } from "@/hooks/useUser"
 import { useLocations } from "@/hooks/useLocations"
@@ -19,6 +20,7 @@ import { CheckoutSteps } from "@/components/checkout/CheckoutSteps"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from "@/lib/utils"
 
 export interface ShippingData {
     firstName: string
@@ -54,9 +56,7 @@ export default function CheckoutPage() {
 
     const [currentStep, setCurrentStep] = useState(1)
     const [isLoading, setIsLoading] = useState(true)
-    const [isValidating, setIsValidating] = useState(false)
     const [isCheckingOut, setIsCheckingOut] = useState(false)
-    const [validationError, setValidationError] = useState<string | null>(null)
 
     // Promo code state
     const { validateDiscount } = useDiscounts()
@@ -418,66 +418,91 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="max-w-screen-xl mx-auto py-8 px-4 md:px-8">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-8">{t('title')}</h1>
+        <div className="min-h-screen bg-surface py-12 px-4 md:px-8 lg:px-16 xl:px-32 max-w-screen-3xl mx-auto">
+            <div className="flex flex-col items-center text-center mb-12">
+                <h1 className="text-4xl md:text-6xl font-serif text-foreground tracking-tight mb-4">
+                    {t('title')}
+                </h1>
+                <div className="w-24 h-1 bg-primary/30 rounded-full" />
+            </div>
 
-            <CheckoutSteps currentStep={currentStep} />
+            <div className="flex justify-center mb-16">
+                <CheckoutSteps currentStep={currentStep} />
+            </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 mt-8">
-                <div className="lg:col-span-2 space-y-6">
-                    {currentStep === 1 && (
-                        <>
-                            {/* Address Selection */}
-                            <AddressSelection
-                                addresses={addresses}
-                                selectedAddressId={selectedAddress?.id || null}
-                                onSelectAddress={handleSelectAddress}
-                                onAddNewAddress={handleAddNewAddress}
-                                isLoading={isLoadingAddresses}
-                            />
-
-                            {/* Location Selection */}
-                            <LocationSelector
-                                locations={locations}
-                                cities={cities}
-                                selectedLocationId={selectedLocationId}
-                                onSelectLocation={handleSelectLocation}
-                                isLoading={isLoadingLocations}
-                            />
-
-                            {/* Continue Button */}
-                            <Button
-                                onClick={handleContinueToReview}
-                                size="lg"
-                                className="w-full"
-                                disabled={!selectedAddress || !selectedLocationId}
+            <div className="grid lg:grid-cols-3 gap-12 items-start">
+                <div className="lg:col-span-2">
+                    <AnimatePresence mode="wait">
+                        {currentStep === 1 && (
+                            <motion.div 
+                                key="step1"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                                transition={{ duration: 0.4 }}
+                                className="space-y-10"
                             >
-                                {t('shipping.continue')}
-                            </Button>
-                        </>
-                    )}
+                                <div className="space-y-8">
+                                    <AddressSelection
+                                        addresses={addresses}
+                                        selectedAddressId={selectedAddress?.id || null}
+                                        onSelectAddress={handleSelectAddress}
+                                        onAddNewAddress={handleAddNewAddress}
+                                        isLoading={isLoadingAddresses}
+                                    />
 
-                    {currentStep === 2 && (
-                        <OrderReview
-                            shippingData={shippingData}
-                            cartData={cartData}
-                            onPlaceOrder={handlePlaceOrder}
-                            onBack={() => setCurrentStep(1)}
-                            isCheckingOut={isCheckingOut}
-                            selectedLocation={selectedLocation}
-                        />
-                    )}
+                                    <LocationSelector
+                                        locations={locations}
+                                        cities={cities}
+                                        selectedLocationId={selectedLocationId}
+                                        onSelectLocation={handleSelectLocation}
+                                        isLoading={isLoadingLocations}
+                                    />
+                                </div>
+
+                                <Button
+                                    onClick={handleContinueToReview}
+                                    size="lg"
+                                    className="w-full h-16 rounded-full text-lg transition-all duration-300 hover:scale-[1.01]"
+                                    disabled={!selectedAddress || !selectedLocationId}
+                                >
+                                    {t('shipping.continue')}
+                                </Button>
+                            </motion.div>
+                        )}
+
+                        {currentStep === 2 && (
+                            <motion.div 
+                                key="step2"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                                transition={{ duration: 0.4 }}
+                            >
+                                <OrderReview
+                                    shippingData={shippingData}
+                                    cartData={cartData}
+                                    onPlaceOrder={handlePlaceOrder}
+                                    onBack={() => setCurrentStep(1)}
+                                    isCheckingOut={isCheckingOut}
+                                    selectedLocation={selectedLocation}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
-                <div>
-                    <CheckoutSummary
-                        cartData={cartData}
-                        selectedLocation={selectedLocation}
-                        appliedDiscount={appliedDiscount}
-                        onApplyPromoCode={handleApplyPromoCode}
-                        onRemovePromoCode={handleRemovePromoCode}
-                        isValidatingPromo={isValidatingPromo}
-                    />
+                <div className="lg:sticky lg:top-24">
+                    <div className="glass backdrop-blur-xl rounded-[3rem] p-2 shadow-2xl">
+                        <CheckoutSummary
+                            cartData={cartData}
+                            selectedLocation={selectedLocation}
+                            appliedDiscount={appliedDiscount}
+                            onApplyPromoCode={handleApplyPromoCode}
+                            onRemovePromoCode={handleRemovePromoCode}
+                            isValidatingPromo={isValidatingPromo}
+                        />
+                    </div>
                 </div>
             </div>
 

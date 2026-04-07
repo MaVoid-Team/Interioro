@@ -5,16 +5,10 @@ import { useTranslations, useLocale } from "next-intl"
 import { useBundles } from "@/hooks/useBundles"
 import { BundleCard } from "@/components/bundles/BundleCard"
 import { Bundle } from "@/types/bundle"
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-
-// Import Swiper styles
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
+import { ArrowRight } from "@phosphor-icons/react"
+import { CuratorNote } from "@/components/ui/CuratorNote"
 
 export function FeaturedBundles() {
     const t = useTranslations('Bundles')
@@ -41,18 +35,12 @@ export function FeaturedBundles() {
 
     if (isLoading) {
         return (
-            <section className="bg-background py-12 px-4 md:px-8 lg:px-28">
-                <div className="container max-w-screen-2xl">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-center mb-12 text-foreground">
-                        {t('featured')}
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {[...Array(4)].map((_, i) => (
-                             <div key={i} className="space-y-3">
-                                <Skeleton className="aspect-[4/5] w-full" />
-                                <Skeleton className="h-4 w-3/4" />
-                                <Skeleton className="h-6 w-1/2" />
-                            </div>
+            <section className="bg-surface py-24 px-6">
+                <div className="container max-w-screen-xl">
+                    <div className="h-12 w-64 bg-muted animate-pulse rounded-full mb-12 mx-auto" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-[2rem]" />
                         ))}
                     </div>
                 </div>
@@ -60,111 +48,70 @@ export function FeaturedBundles() {
         )
     }
 
-    if (bundles.length === 0) {
-        return null
-    }
+    if (bundles.length === 0) return null
 
     return (
-        <section className="bg-background py-12">
-            <div className="max-w-screen-3xl px-4 md:px-8 lg:px-28">
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between gap-3">
-                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                            {t('featured')}
-                        </h2>
-
-                        {/* Navigation Buttons */}
-                        <div className="hidden sm:flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="featured-bundles-prev rounded-full"
-                            >
-                                {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="featured-bundles-next rounded-full"
-                            >
-                                {isRtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                            </Button>
-                        </div>
+        <section className="bg-surface-container-highest py-24 overflow-hidden">
+            <div className="container max-w-screen-xl px-6">
+                <div className={`flex flex-col ${isRtl ? 'items-end text-end' : 'items-start text-start'} mb-16`}>
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-4xl md:text-6xl font-serif font-bold tracking-tighter text-foreground mb-4"
+                    >
+                        {t('featured')}
+                    </motion.h2>
+                    <div className="flex gap-4 mt-4">
+                        <CuratorNote title="The Curator's Choice">
+                            These bundles were assembled to create a cohesive atmosphere, blending textures and tones that evoke a sense of organic serenity.
+                        </CuratorNote>
                     </div>
                 </div>
 
-                <Swiper
-                    modules={[Navigation, Pagination, Autoplay]}
-                    spaceBetween={24}
-                    slidesPerView={1}
-                    navigation={{
-                        prevEl: '.featured-bundles-prev',
-                        nextEl: '.featured-bundles-next',
-                    }}
-                    pagination={{
-                        clickable: true,
-                        dynamicBullets: true,
-                    }}
-                    autoplay={{
-                        delay: 6000,
-                        disableOnInteraction: false,
-                        pauseOnMouseEnter: true,
-                    }}
-                    breakpoints={{
-                        480: {
-                            slidesPerView: 2,
-                            spaceBetween: 12,
-                        },
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 16,
-                        },
-                        768: {
-                            slidesPerView: 3,
-                            spaceBetween: 20,
-                        },
-                        1024: {
-                            slidesPerView: 3,
-                            spaceBetween: 24,
-                        },
-                        1280: {
-                            slidesPerView: 4,
-                            spaceBetween: 24,
-                        },
-                    }}
-                    className="featured-bundles-swiper pb-12"
-                >
-                    {bundles.map((bundle) => (
-                        <SwiperSlide key={bundle.id} className="h-auto">
-                            <BundleCard
-                                bundle={bundle}
-                                className="h-full"
-                            />
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    {/* Main Bundle - Large */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: isRtl ? 50 : -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="lg:col-span-7 relative"
+                    >
+                        <BundleCard
+                            bundle={bundles[0]}
+                            className="shadow-2xl rounded-[3rem] scale-105"
+                        />
+                        {/* Overlapping decorative element */}
+                        <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/10 rounded-full blur-2xl -z-10" />
+                    </motion.div>
+
+                    {/* Secondary Bundles - Stacked */}
+                    <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {bundles.slice(1, 3).map((bundle, i) => (
+                            <motion.div 
+                                key={bundle.id}
+                                initial={{ opacity: 0, x: isRtl ? -50 : 50 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.2 }}
+                                className="relative"
+                            >
+                                <BundleCard
+                                    bundle={bundle}
+                                    className="rounded-[2rem]"
+                                />
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className={`flex ${isRtl ? 'justify-end' : 'justify-start'} mt-16`}>
+                    <Button variant="outline" size="lg" className="rounded-full px-8 group">
+                        Explore all Curations
+                        <ArrowRight className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                </div>
             </div>
-
-            <style jsx global>{`
-                .featured-bundles-swiper .swiper-pagination {
-                    bottom: 0;
-                }
-
-                .featured-bundles-swiper .swiper-pagination-bullet {
-                    background: hsl(var(--primary));
-                    opacity: 0.3;
-                }
-
-                .featured-bundles-swiper .swiper-pagination-bullet-active {
-                    opacity: 1;
-                }
-
-                .featured-bundles-swiper .swiper-button-disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-            `}</style>
         </section>
     )
 }

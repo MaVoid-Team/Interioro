@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
+import { motion, AnimatePresence } from "framer-motion"
 import { useDebounce } from "@/hooks/useDebounce"
 import { useCategories } from "@/hooks/useCategories"
 import { useManufacturers } from "@/hooks/useManufacturers"
@@ -11,8 +12,6 @@ import { ProductCard, Product } from "@/components/products/ProductCard"
 import { CategoriesGrid } from "@/components/products/CategoriesGrid"
 import {
     ProductFilters,
-    ProductsGridSkeleton,
-    AllProductsPageSkeleton,
     ProductType
 } from "@/components/products/ProductFilters"
 import {
@@ -231,12 +230,12 @@ export function AllProducts({
     }
 
     return (
-        <div className={`max-w-screen-3xl py-8 px-4 md:px-8 lg:px-28`}>
-            {/* Header Section */}
-            <div className="flex flex-col gap-6 mb-8">
-                <div className="flex items-center justify-between">
+        <div className="min-h-screen bg-surface py-12 px-4 md:px-8 lg:px-28 max-w-screen-3xl mx-auto">
+            {/* Editorial Header */}
+            <div className="flex flex-col gap-8 mb-16">
+                <div className="flex items-center justify-between gap-4">
                     {showTitle && (
-                        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+                        <h1 className="text-4xl md:text-6xl font-serif text-foreground tracking-tight leading-tight">
                             {title || t('title')}
                         </h1>
                     )}
@@ -244,46 +243,50 @@ export function AllProducts({
                         variant="outline"
                         size="sm"
                         onClick={() => setShowFilters(!showFilters)}
-                        className="md:hidden"
+                        className="rounded-full px-6 py-6 glass hover:bg-surface-container-low transition-all duration-300"
                     >
                         <Filter className="h-4 w-4 me-2" />
                         {showFilters ? t('hideFilters') : t('showFilters')}
                     </Button>
                 </div>
 
-                {/* Search Bar */}
+                {/* Search Bar as a Curator's Tool */}
                 {showSearch && (
-                    <ProductSearchBar
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        className="max-w-2xl"
-                    />
+                    <div className="relative max-w-2xl group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                        <ProductSearchBar
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                            className="relative rounded-full glass border-none shadow-sm"
+                        />
+                    </div>
                 )}
 
-                {/* Active Filters Summary */}
+                {/* Active Filters as Curator's Tags */}
                 {(searchQuery || selectedCategory || selectedManufacturers.length > 0 || selectedProductTypes.length > 0 || inStockOnly) && showSearch && (
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{tPage('activeFilters')}:</span>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <span className="text-sm font-medium text-muted-foreground italic">Curated by:</span>
                         {searchQuery && (
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => setSearchQuery('')}
-                                className="h-7 gap-1"
-                            >
-                                "{searchQuery}"
-                                <X className="h-3 w-3" />
-                            </Button>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => setSearchQuery('')}
+                                    className="rounded-full h-8 px-4 glass border-none text-xs hover:scale-105 transition-transform"
+                                >
+                                    &quot;{searchQuery}&quot;
+                                    <X className="h-3 w-3 ms-2" />
+                                </Button>
+
                         )}
                         {selectedCategory && (
                             <Button
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => setSelectedCategory(null)}
-                                className="h-7 gap-1"
+                                className="rounded-full h-8 px-4 glass border-none text-xs hover:scale-105 transition-transform"
                             >
                                 {categories.find(c => c.id === selectedCategory)?.name}
-                                <X className="h-3 w-3" />
+                                <X className="h-3 w-3 ms-2" />
                             </Button>
                         )}
                         {selectedManufacturers.map(id => (
@@ -292,10 +295,10 @@ export function AllProducts({
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => toggleManufacturer(id)}
-                                className="h-7 gap-1"
+                                className="rounded-full h-8 px-4 glass border-none text-xs hover:scale-105 transition-transform"
                             >
                                 {manufacturers.find(m => m.id === id)?.name}
-                                <X className="h-3 w-3" />
+                                <X className="h-3 w-3 ms-2" />
                             </Button>
                         ))}
                         {selectedProductTypes.map(id => (
@@ -304,10 +307,10 @@ export function AllProducts({
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => toggleProductType(id)}
-                                className="h-7 gap-1"
+                                className="rounded-full h-8 px-4 glass border-none text-xs hover:scale-105 transition-transform"
                             >
                                 {productTypes.find(p => p.id === id)?.name}
-                                <X className="h-3 w-3" />
+                                <X className="h-3 w-3 ms-2" />
                             </Button>
                         ))}
                         {inStockOnly && (
@@ -315,17 +318,17 @@ export function AllProducts({
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => setInStockOnly(false)}
-                                className="h-7 gap-1"
+                                className="rounded-full h-8 px-4 glass border-none text-xs hover:scale-105 transition-transform"
                             >
                                 {t('inStockOnly')}
-                                <X className="h-3 w-3" />
+                                <X className="h-3 w-3 ms-2" />
                             </Button>
                         )}
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={clearFilters}
-                            className="h-7 text-destructive hover:text-destructive"
+                            className="h-8 text-destructive hover:text-destructive hover:bg-destructive/5 rounded-full text-xs"
                         >
                             {tPage('clearAll')}
                         </Button>
@@ -333,9 +336,12 @@ export function AllProducts({
                 )}
             </div>
 
-            {/* Categories Carousel */}
-            <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-foreground">{t('categories')}</h2>
+            {/* Categories as a Curator's Selection */}
+            <div className="mb-16">
+                <div className="flex items-baseline gap-4 mb-6">
+                    <h2 className="text-2xl font-serif text-foreground">{t('categories')}</h2>
+                    <div className="h-px flex-1 bg-surface-container-low"></div>
+                </div>
                 <CategoriesGrid
                     categories={categories}
                     selectedCategoryId={selectedCategory}
@@ -344,57 +350,109 @@ export function AllProducts({
                 />
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6">
-                {/* Filters Sidebar */}
-                <ProductFilters
-                    manufacturers={manufacturers}
-                    productTypes={productTypes}
-                    selectedManufacturers={selectedManufacturers}
-                    selectedProductTypes={selectedProductTypes}
-                    priceRange={priceRange}
-                    inStockOnly={inStockOnly}
-                    onManufacturerToggle={toggleManufacturer}
-                    onProductTypeToggle={toggleProductType}
-                    onPriceRangeChange={setPriceRange}
-                    onInStockOnlyChange={setInStockOnly}
-                    onClearFilters={clearFilters}
-                    isVisible={showFilters}
-                    minPrice={products.length > 0 ? Math.floor(Math.min(...products.map(p => parseFloat(p.price)))) : 0}
-                    maxPrice={products.length > 0 ? Math.ceil(Math.max(...products.map(p => parseFloat(p.price)))) : 5000}
-                />
+            <div className="relative flex flex-col gap-12">
+                {/* Integrated Filter Panel (Slide-out or Overlaid) */}
+                {showFilters && (
+                    <div className="fixed inset-0 z-50 flex justify-end p-0 md:p-8 pointer-events-none">
+                        <div className="pointer-events-auto w-full max-w-md h-full glass backdrop-blur-xl rounded-none md:rounded-[3rem] shadow-2xl border-l border-white/20 p-6 overflow-y-auto animate-in slide-in-from-right duration-500">
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="text-2xl font-serif">{tPage('filters')}</h3>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => setShowFilters(false)}
+                                    className="rounded-full"
+                                >
+                                    <X className="h-5 w-5" />
+                                </Button>
+                            </div>
+                            <ProductFilters
+                                manufacturers={manufacturers}
+                                productTypes={productTypes}
+                                selectedManufacturers={selectedManufacturers}
+                                selectedProductTypes={selectedProductTypes}
+                                priceRange={priceRange}
+                                inStockOnly={inStockOnly}
+                                onManufacturerToggle={toggleManufacturer}
+                                onProductTypeToggle={toggleProductType}
+                                onPriceRangeChange={setPriceRange}
+                                onInStockOnlyChange={setInStockOnly}
+                                onClearFilters={clearFilters}
+                                isVisible={true}
+                                minPrice={products.length > 0 ? Math.floor(Math.min(...products.map(p => parseFloat(p.price)))) : 0}
+                                maxPrice={products.length > 0 ? Math.ceil(Math.max(...products.map(p => parseFloat(p.price)))) : 5000}
+                            />
+                        </div>
+                    </div>
+                )}
 
-                {/* Products Grid */}
+                {/* Asymmetric Product Gallery */}
                 <div className="flex-1">
-                    <div className="mb-4 text-sm text-muted-foreground">
-                        {t('showing', { count: filteredProducts.length })}
+                    <div className="mb-8 flex items-center justify-between text-sm text-muted-foreground italic">
+                        <div>
+                            {t('showing', { count: filteredProducts.length })}
+                        </div>
                     </div>
 
-                    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6`}>
-                        {paginatedProducts.map(product => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                showMetadata={true}
-                                showLowStockWarning={true}
-                            />
-                        ))}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[auto] gap-6 md:gap-10">
+                        <AnimatePresence mode="popLayout">
+                            {paginatedProducts.map((product, index) => {
+                                // Create asymmetry: some cards span 2 columns or 2 rows
+                                const isLarge = index % 7 === 0;
+                                const isTall = index % 5 === 0 && !isLarge;
+                                
+                                return (
+                                    <motion.div 
+                                        key={product.id} 
+                                        layout
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        transition={{ 
+                                            duration: 0.5, 
+                                            delay: index * 0.05,
+                                            type: "spring",
+                                            stiffness: 100
+                                        }}
+                                        className={cn(
+                                            "transition-all duration-500 hover:scale-[1.02]",
+                                            isLarge && "sm:col-span-2",
+                                            isTall && "sm:row-span-2"
+                                        )}
+                                    >
+                                        <ProductCard
+                                            product={product}
+                                            showMetadata={true}
+                                            showLowStockWarning={true}
+                                            className={cn(
+                                                "h-full w-full",
+                                                isLarge && "rounded-[3rem]"
+                                            )}
+                                        />
+                                    </motion.div>
+                                );
+                            })}
+                        </AnimatePresence>
                     </div>
 
                     {paginatedProducts.length === 0 && (
-                        <div className="text-center py-12">
-                            <p className="text-muted-foreground">{t('noProducts')}</p>
+                        <div className="text-center py-24 glass rounded-[3rem]">
+                            <p className="text-muted-foreground font-serif text-xl">{t('noProducts')}</p>
                         </div>
                     )}
 
-                    {/* Pagination */}
+                    {/* Pagination as an Editorial Footer */}
                     {totalPages > 1 && (
-                        <div className="mt-8">
+                        <div className="mt-20 py-12 border-t border-surface-container-low flex flex-col items-center gap-8">
                             <Pagination>
-                                <PaginationContent>
+                                <PaginationContent className="gap-2">
                                     <PaginationItem>
                                         <PaginationPrevious
                                             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                            className={cn(
+                                                "rounded-full px-6 py-2 transition-all",
+                                                currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer hover:bg-surface-container-low'
+                                            )}
                                         >
                                             {tPage('previous')}
                                         </PaginationPrevious>
@@ -408,7 +466,12 @@ export function AllProducts({
                                                 <PaginationLink
                                                     onClick={() => setCurrentPage(page as number)}
                                                     isActive={currentPage === page}
-                                                    className="cursor-pointer"
+                                                    className={cn(
+                                                        "rounded-full w-12 h-12 flex items-center justify-center transition-all",
+                                                        currentPage === page 
+                                                            ? "bg-primary text-primary-foreground shadow-lg" 
+                                                            : "hover:bg-surface-container-low"
+                                                    )}
                                                 >
                                                     {page}
                                                 </PaginationLink>
@@ -419,7 +482,10 @@ export function AllProducts({
                                     <PaginationItem>
                                         <PaginationNext
                                             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                            className={cn(
+                                                "rounded-full px-6 py-2 transition-all",
+                                                currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer hover:bg-surface-container-low'
+                                            )}
                                         >
                                             {tPage('next')}
                                         </PaginationNext>
@@ -427,7 +493,7 @@ export function AllProducts({
                                 </PaginationContent>
                             </Pagination>
 
-                            <div className="text-center mt-4 text-sm text-muted-foreground">
+                            <div className="text-center text-sm text-muted-foreground font-serif italic">
                                 {tPage('pageOf', { current: currentPage, total: totalPages })}
                             </div>
                         </div>

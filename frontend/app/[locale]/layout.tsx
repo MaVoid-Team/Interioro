@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Noto_Serif, Manrope, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "../globals.css";
 import { Navbar } from "@/components/Landing/Navbar";
 import { Footer } from "@/components/Landing/Footer";
@@ -10,14 +10,21 @@ import { getMessages } from 'next-intl/server';
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
-// Inter - Clean, modern font designed for screens. Used by top tech companies.
-const inter = Inter({
-    variable: "--font-inter",
+// Noto Serif - The brand's voice. Elegant and artistic authority.
+const notoSerif = Noto_Serif({
+    variable: "--font-noto-serif",
     subsets: ["latin"],
     display: "swap",
 });
 
-// IBM Plex Sans Arabic - Professional Arabic font that pairs perfectly with Inter
+// Manrope - Clean geometric sans-serif for high legibility.
+const manrope = Manrope({
+    variable: "--font-manrope",
+    subsets: ["latin"],
+    display: "swap",
+});
+
+// IBM Plex Sans Arabic - Professional Arabic font that pairs perfectly with Manrope
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
     variable: "--font-ibm-plex-arabic",
     weight: ["300", "400", "500", "600", "700"],
@@ -52,9 +59,9 @@ export default async function RootLayout({
 
     return (
         <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-            <body
-                className={`${inter.variable} ${ibmPlexArabic.variable} ${locale === 'ar' ? ibmPlexArabic.className : inter.className} antialiased`}
-            >
+                <body
+                    className={`${notoSerif.variable} ${manrope.variable} ${ibmPlexArabic.variable} ${locale === 'ar' ? ibmPlexArabic.className : manrope.className} antialiased`}
+                >
                 <NextIntlClientProvider messages={messages}>
                     <AuthProvider>
                         <ThemeProvider

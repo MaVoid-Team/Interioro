@@ -4,16 +4,10 @@ import { useEffect, useState } from "react"
 import { useTranslations, useLocale } from "next-intl"
 import { ProductCard, Product } from "@/components/products/ProductCard"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { useProducts } from "@/hooks/useProducts"
-
-// Import Swiper styles
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
+import { ArrowRight } from "@phosphor-icons/react"
 
 export function JustArrived() {
     const t = useTranslations('JustArrived')
@@ -27,8 +21,7 @@ export function JustArrived() {
         const fetchJustArrived = async () => {
             setIsLoading(true)
             try {
-                // Fetch recent products using the hook
-                const result = await fetchPublicProducts({ page: 1, limit: 10 })
+                const result = await fetchPublicProducts({ page: 1, limit: 8 })
                 setProducts(result?.data || [])
             } catch (error) {
                 console.error('Failed to fetch just arrived products:', error)
@@ -42,19 +35,15 @@ export function JustArrived() {
 
     if (isLoading) {
         return (
-            <section className="py-2 bg-muted/30">
-                <div className="container max-w-screen-2xl px-4 md:px-8 lg:px-28">
-                    <div className="mb-8">
-                        <Skeleton className="h-8 w-48 mb-2" />
-                        <Skeleton className="h-4 w-64" />
+            <section className="py-20 bg-surface">
+                <div className="container max-w-screen-xl px-6">
+                    <div className="mb-12">
+                        <Skeleton className="h-12 w-64 mb-4" />
+                        <Skeleton className="h-6 w-96" />
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        {[...Array(5)].map((_, i) => (
-                            <div key={i} className="space-y-3">
-                                <Skeleton className="aspect-square w-full" />
-                                <Skeleton className="h-4 w-3/4" />
-                                <Skeleton className="h-6 w-1/2" />
-                            </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        {[...Array(4)].map((_, i) => (
+                            <Skeleton key={i} className="aspect-[3/4] w-full rounded-[2rem]" />
                         ))}
                     </div>
                 </div>
@@ -62,118 +51,74 @@ export function JustArrived() {
         )
     }
 
-    if (products.length === 0) {
-        return null
-    }
+    if (products.length === 0) return null
 
     return (
-        <section className="py-2 bg-muted/30">
-            <div className="max-w-screen-3xl px-4 md:px-8 lg:px-28">
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-start sm:items-center justify-between gap-3">
-                        <div>
-                            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-2">
-                                {t('title')}
-                            </h2>
-                            <p className="text-sm sm:text-base text-muted-foreground">
-                                {t('description')}
-                            </p>
-                        </div>
-
-                        {/* Navigation Buttons */}
-                        <div className="hidden sm:flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="just-arrived-prev rounded-full"
-                            >
-                                {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="just-arrived-next rounded-full"
-                            >
-                                {isRtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                            </Button>
-                        </div>
-                    </div>
+        <section className="py-24 bg-surface overflow-hidden">
+            <div className="container max-w-screen-xl px-6">
+                {/* Editorial Header */}
+                <div className={`flex flex-col ${isRtl ? 'items-end text-end' : 'items-start text-start'} mb-16`}>
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-4xl md:text-6xl font-serif font-bold tracking-tighter text-foreground mb-4"
+                    >
+                        {t('title')}
+                    </motion.h2>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="text-lg text-muted-foreground max-w-xl leading-relaxed font-sans"
+                    >
+                        {t('description')}
+                    </motion.p>
                 </div>
 
-                {/* Swiper Carousel */}
-                <Swiper
-                    modules={[Navigation, Pagination, Autoplay]}
-                    spaceBetween={16}
-                    slidesPerView={2}
-                    navigation={{
-                        prevEl: '.just-arrived-prev',
-                        nextEl: '.just-arrived-next',
-                    }}
-                    pagination={{
-                        clickable: true,
-                        dynamicBullets: true,
-                    }}
-                    autoplay={{
-                        delay: 5000,
-                        disableOnInteraction: false,
-                        pauseOnMouseEnter: true,
-                    }}
-                    breakpoints={{
-                        480: {
-                            slidesPerView: 2,
-                            spaceBetween: 12,
-                        },
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 16,
-                        },
-                        768: {
-                            slidesPerView: 3,
-                            spaceBetween: 20,
-                        },
-                        1024: {
-                            slidesPerView: 4,
-                            spaceBetween: 24,
-                        },
-                        1280: {
-                            slidesPerView: 5,
-                            spaceBetween: 24,
-                        },
-                    }}
-                    className="just-arrived-swiper pb-12"
-                >
-                    {products.map((product) => (
-                        <SwiperSlide key={product.id}>
-                            <ProductCard
-                                product={product}
-                                isJustAdded={true}
-                                showMetadata={true}
-                            />
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
-            </div>
+                {/* Asymmetric Curated Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    {products.slice(0, 5).map((product, i) => {
+                        // Create asymmetric layout: 1st product is large, others vary
+                        const isMain = i === 0;
+                        const isMedium = i === 1 || i === 3;
+                        
+                        return (
+                            <motion.div 
+                                key={product.id}
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1, type: "spring", stiffness: 100, damping: 20 }}
+                                className={cn(
+                                    "relative",
+                                    isMain ? "md:col-span-7" : isMedium ? "md:col-span-5" : "md:col-span-4"
+                                )}
+                            >
+                                <div className="h-full">
+                                    <ProductCard
+                                        product={product}
+                                        isJustAdded={true}
+                                        showMetadata={true}
+                                    />
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+                </div>
 
-            <style jsx global>{`
-                .just-arrived-swiper .swiper-pagination {
-                    bottom: 0;
-                }
-                
-                .just-arrived-swiper .swiper-pagination-bullet {
-                    background: hsl(var(--primary));
-                    opacity: 0.3;
-                }
-                
-                .just-arrived-swiper .swiper-pagination-bullet-active {
-                    opacity: 1;
-                }
-                
-                .just-arrived-swiper .swiper-button-disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-            `}</style>
+                <div className={`flex ${isRtl ? 'justify-end' : 'justify-start'} mt-16`}>
+                    <Button variant="outline" size="lg" className="rounded-full px-8 group">
+                        Explore All New Arrivals
+                        <ArrowRight className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                </div>
+            </div>
         </section>
     )
+}
+
+function cn(...inputs: any[]) {
+    return inputs.filter(Boolean).join(' ');
 }
