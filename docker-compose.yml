@@ -6,9 +6,9 @@ services:
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USER: techstore
+      DB_USER: interioro
       DB_PASS: w3uRU[{0960n
-      DB_NAME: techstore_db
+      DB_NAME: interioro_db
       PORT: 3000
       CLOUDINARY_CLOUD_NAME: dv4enxyxo
       CLOUDINARY_API_KEY: 964321319365178
@@ -39,9 +39,9 @@ services:
   postgres:
     image: postgres:18-alpine
     environment:
-      POSTGRES_USER: techstore
+      POSTGRES_USER: interioro
       POSTGRES_PASSWORD: w3uRU[{0960n
-      POSTGRES_DB: techstore_db
+      POSTGRES_DB: interioro_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

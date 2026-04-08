@@ -220,7 +220,7 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
             >
                 {!collapsed && (
                     <p className={cn("text-xs text-muted-foreground", isRtl && "text-right")}>
-                        © {new Date().getFullYear()} Al-Nojoom
+                        © {new Date().getFullYear()} Interioro
                     </p>
                 )}
             </div>

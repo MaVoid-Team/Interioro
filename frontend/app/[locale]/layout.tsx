@@ -33,8 +33,8 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-    title: "Al-Nojoom Al-Rakia",
-    description: "Premium E-commerce Store",
+    title: "Interioro",
+    description: "Premium Wall Decorations, Wallpapers & Wall Art Store",
     icons: {
         icon: [
             { url: '/Logo_with_background.png', sizes: '32x32', type: 'image/png' },
@@ -58,7 +58,7 @@ export default async function RootLayout({
     const messages = await getMessages();
 
     return (
-        <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
                 <body
                     className={`${notoSerif.variable} ${manrope.variable} ${ibmPlexArabic.variable} ${locale === 'ar' ? ibmPlexArabic.className : manrope.className} antialiased`}
                 >

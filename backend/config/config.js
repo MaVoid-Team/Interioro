@@ -12,7 +12,7 @@ module.exports = {
   test: {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME_TEST || "techstore_test",
+    database: process.env.DB_NAME_TEST || "interioro_test",
     host: process.env.DB_HOST,
     dialect: "postgres",
     logging: false,

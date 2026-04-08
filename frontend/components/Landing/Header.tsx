@@ -2,15 +2,16 @@
 
 import { Link } from "@/i18n/navigation"
 import { useTranslations, useLocale } from "next-intl"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export function Header() {
     const t = useTranslations('Footer')
     const locale = useLocale()
     const isRtl = locale === 'ar'
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -21,7 +22,7 @@ export function Header() {
         },
     }
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { 
             opacity: 0, 
             y: 30,
@@ -31,21 +32,20 @@ export function Header() {
             opacity: 1, 
             y: 0, 
             x: 0,
-            transition: { type: "spring", stiffness: 100, damping: 20 } 
+            transition: { type: "spring" as const, stiffness: 100, damping: 20 } 
         },
     }
 
     return (
-        <section className="relative w-full min-h-[80dvh] flex items-center overflow-hidden bg-surface">
-            {/* Background Video with Editorial Overlay */}
+        <section className="relative w-full min-h-[90dvh] flex items-center overflow-hidden bg-surface">
+            {/* Background Image with Editorial Overlay */}
             <div className="absolute inset-0 z-0">
-                <video
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src="/upscaled-hero-animated.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
+                <Image
+                    src="/unnamed.png"
+                    alt="Interioro Wall Decor"
+                    fill
+                    className="object-cover"
+                    priority
                 />
                 <div className={`absolute inset-0 ${isRtl ? 'bg-linear-to-l' : 'bg-linear-to-r'} from-black/90 via-black/40 to-transparent`} />
             </div>

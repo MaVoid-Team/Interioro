@@ -40,7 +40,7 @@ export function Navbar() {
                         <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-primary/10">
                             <Image
                                 src="/Logo.png"
-                                alt="Al-Nojoom Logo"
+                                alt="Interioro Logo"
                                 fill
                                 className="object-cover"
                                 priority

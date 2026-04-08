@@ -21,7 +21,7 @@ export function Footer() {
                             <div className="relative h-14 w-14 sm:h-20 sm:w-20 md:h-24 md:w-24 overflow-hidden rounded-lg shrink-0">
                                 <Image
                                     src="/Logo.png"
-                                    alt="Al-Nojoom Logo"
+                                    alt="Interioro Logo"
                                     fill
                                     className="object-cover"
                                 />

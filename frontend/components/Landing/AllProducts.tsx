@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { motion, AnimatePresence } from "framer-motion"
 import { useDebounce } from "@/hooks/useDebounce"
@@ -12,7 +13,8 @@ import { ProductCard, Product } from "@/components/products/ProductCard"
 import { CategoriesGrid } from "@/components/products/CategoriesGrid"
 import {
     ProductFilters,
-    ProductType
+    ProductType,
+    AllProductsPageSkeleton
 } from "@/components/products/ProductFilters"
 import {
     Pagination,
@@ -79,7 +81,7 @@ export function AllProducts({
         initialCategoryId || null
     )
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000])
-    const [showFilters, setShowFilters] = useState(true)
+    const [showFilters, setShowFilters] = useState(false)
     const [inStockOnly, setInStockOnly] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
 

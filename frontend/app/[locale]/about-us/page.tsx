@@ -24,7 +24,7 @@ export default function AboutUsPage() {
                         <div className="relative h-20 w-20 sm:h-24 sm:w-24 md:h-32 md:w-32 overflow-hidden rounded-2xl">
                             <Image
                                 src="/Logo.png"
-                                alt="Al-Nojoom Logo"
+                                alt="Interioro Logo"
                                 fill
                                 className="object-cover"
                             />

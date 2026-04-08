@@ -16,8 +16,8 @@ Create a `backend/.env` file (or update the existing one) with everything the Ex
 ```
 PORT=3000
 DB_HOST=postgres.internal
-DB_NAME=nojoom
-DB_USER=nojoom
+DB_NAME=interioro
+DB_USER=interioro
 DB_PASS=supersecret
 JWT_SECRET=change-me
 CLOUDINARY_CLOUD_NAME=...
@@ -28,7 +28,7 @@ CLOUDINARY_API_SECRET=...
 The frontend only needs a public API URL. By default the compose file injects the internal service URL (`http://backend:3000/api/v1`). Override it in a host `.env` file placed next to `docker-compose.yml` if you need something else:
 
 ```
-NEXT_PUBLIC_API_URL=https://api.nojoom.example.com/api/v1
+NEXT_PUBLIC_API_URL=https://api.interioro.example.com/api/v1
 FRONTEND_PORT=8080
 BACKEND_PORT=4000
 ```
