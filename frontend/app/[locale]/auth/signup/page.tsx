@@ -16,13 +16,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { toast } from "sonner"
 
 export default function SignupPage() {
@@ -34,8 +27,7 @@ export default function SignupPage() {
         email: "",
         firstName: "",
         lastName: "",
-        password: "",
-        role: "customer"
+        password: ""
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +38,12 @@ export default function SignupPage() {
             const res = await fetch("/api/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    email: formData.email,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    password: formData.password,
+                }),
             })
 
             if (!res.ok) throw new Error(t('signupFailure'))
@@ -125,21 +122,6 @@ export default function SignupPage() {
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 required
                             />
-                        </div>
-                        <div className="grid gap-2 mb-4">
-                            <Label htmlFor="role">{t('role')}</Label>
-                            <Select
-                                defaultValue="customer"
-                                onValueChange={(value) => setFormData({ ...formData, role: value })}
-                            >
-                                <SelectTrigger id="role" className="w-full">
-                                    <SelectValue placeholder={t('selectRole')} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="customer">{t('customer')}</SelectItem>
-                                    <SelectItem value="admin">{t('admin')}</SelectItem>
-                                </SelectContent>
-                            </Select>
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col gap-4">

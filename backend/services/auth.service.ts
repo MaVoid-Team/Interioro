@@ -12,9 +12,12 @@ export class AuthService {
       throw error;
     }
 
-    // User model hook handles hashing
+    // User model hook handles hashing. Public registration must never accept
+    // privileged fields from the request body.
     const user = await User.create({
-      ...data,
+      email: data?.email,
+      password: data?.password,
+      role: "customer",
       firstName,
       lastName,
     });

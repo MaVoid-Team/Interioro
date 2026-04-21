@@ -27,6 +27,7 @@ import {
 import { Filter, X } from "lucide-react"
 
 const PRODUCTS_PER_PAGE = 6
+const HOME_PRODUCTS_LIMIT = 12
 
 interface AllProductsProps {
     /** Initial search query */
@@ -231,7 +232,7 @@ export function AllProducts({
     }
 
     const isCatalogPage = showSearch
-    const visibleProducts = isCatalogPage ? paginatedProducts : filteredProducts.slice(0, 8)
+    const visibleProducts = isCatalogPage ? paginatedProducts : filteredProducts.slice(0, HOME_PRODUCTS_LIMIT)
 
     return (
         <section className="mx-auto max-w-screen-3xl bg-surface px-4 py-10 sm:py-12 md:px-8 lg:px-28 lg:py-16">
@@ -401,7 +402,7 @@ export function AllProducts({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-4 lg:gap-8">
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 md:gap-6 xl:grid-cols-4 xl:gap-8">
                         {visibleProducts.map((product) => (
                             <ProductCard
                                 key={product.id}
