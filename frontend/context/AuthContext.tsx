@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useState } from "react"
 import { useRouter } from "@/i18n/navigation"
 
 export interface Address {
@@ -39,33 +39,53 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null)
-    const [token, setToken] = useState<string | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-    const router = useRouter()
+    const [authState, setAuthState] = useState<{
+        user: User | null
+        token: string | null
+        isLoading: boolean
+    }>(() => {
+        if (typeof window === "undefined") {
+            return { user: null, token: null, isLoading: true }
+        }
 
-    useEffect(() => {
-        // Check for token and user in localStorage on mount
         const storedToken = localStorage.getItem("token")
         const storedUser = localStorage.getItem("user")
 
-        if (storedToken && storedUser) {
-            setToken(storedToken)
-            setUser(JSON.parse(storedUser))
+        if (!storedToken || !storedUser) {
+            return { user: null, token: null, isLoading: false }
         }
-        setIsLoading(false)
-    }, [])
+
+        try {
+            return {
+                user: JSON.parse(storedUser) as User,
+                token: storedToken,
+                isLoading: false,
+            }
+        } catch {
+            localStorage.removeItem("token")
+            localStorage.removeItem("user")
+            return { user: null, token: null, isLoading: false }
+        }
+    })
+    const router = useRouter()
+    const { user, token, isLoading } = authState
 
     const login = (newToken: string, newUser: User) => {
-        setToken(newToken)
-        setUser(newUser)
+        setAuthState({
+            user: newUser,
+            token: newToken,
+            isLoading: false,
+        })
         localStorage.setItem("token", newToken)
         localStorage.setItem("user", JSON.stringify(newUser))
     }
 
     const logout = () => {
-        setToken(null)
-        setUser(null)
+        setAuthState({
+            user: null,
+            token: null,
+            isLoading: false,
+        })
         localStorage.removeItem("token")
         localStorage.removeItem("user")
         router.push("/auth/login")

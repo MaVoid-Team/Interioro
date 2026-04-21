@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, Home, ShoppingBag, User, LogIn, Package, Loader2, ArrowRight, Tag, Building2, Layers, Boxes, FileText, RefreshCcw, Shield, Info } from "lucide-react"
+import { Search, Home, ShoppingBag, User, LogIn, Package, Loader2, ArrowRight, Tag, Building2, Layers, Boxes, FileText, RefreshCcw, Shield, Info, Paintbrush } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
@@ -68,6 +68,7 @@ export function SearchBar() {
         { name: t('products'), path: '/products', icon: ShoppingBag },
         { name: t('bundles'), path: '/bundles', icon: Boxes },
         { name: t('categories'), path: '/categories', icon: Tag },
+        { name: t('designServices'), path: '/design-services', icon: Paintbrush },
         { name: t('profile'), path: '/profile', icon: User },
         { name: t('login'), path: '/auth/login', icon: LogIn },
         { name: t('signup'), path: '/auth/signup', icon: User },
@@ -75,11 +76,11 @@ export function SearchBar() {
 
     // Legal pages for navigation
     const legalPages = [
-        { name: t('about'), path: '/about', icon: Info },
-        { name: t('privacyPolicy'), path: '/privacy', icon: Shield },
-        { name: t('termsConditions'), path: '/terms', icon: FileText },
-        { name: t('returnsExchanges'), path: '/returns', icon: RefreshCcw },
-        { name: t('warrantyMaintenance'), path: '/warranty', icon: Shield },
+        { name: t('about'), path: '/about-us', icon: Info },
+        { name: t('privacyPolicy'), path: '/privacy-policy', icon: Shield },
+        { name: t('termsConditions'), path: '/terms-and-conditions', icon: FileText },
+        { name: t('returnsExchanges'), path: '/returns-exchanges', icon: RefreshCcw },
+        { name: t('warrantyMaintenance'), path: '/warranty-maintenance', icon: Shield },
     ]
 
     // Toggle command menu with Ctrl+S
@@ -283,7 +284,9 @@ export function SearchBar() {
                                     className="cursor-pointer bg-muted/50"
                                 >
                                     <Search className="me-2 h-4 w-4" />
-                                    <span className="flex-1">{t('viewAllResults')} "{searchQuery}"</span>
+                                    <span className="flex-1">
+                                        {t('viewAllResults')} &quot;{searchQuery}&quot;
+                                    </span>
                                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                                 </CommandItem>
                             </CommandGroup>

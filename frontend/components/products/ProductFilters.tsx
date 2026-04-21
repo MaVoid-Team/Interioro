@@ -126,9 +126,9 @@ export function ProductFilters({
     }
 
     return (
-        <aside className={`${isVisible ? 'block' : 'hidden'} md:block w-full md:w-64 space-y-6 ${className}`}>
-            <Card className="my-9 bg-card">
-                <CardHeader className="flex flex-row items-center justify-between">
+        <aside className={`${isVisible ? 'block' : 'hidden'} w-full space-y-6 md:block md:w-64 ${className}`}>
+            <Card className="my-0 bg-card md:my-9">
+                <CardHeader className="flex flex-row items-center justify-between gap-3 p-4 sm:p-6">
                     <CardTitle className="text-lg">{t('filters')}</CardTitle>
                     <Button
                         variant="ghost"
@@ -139,7 +139,7 @@ export function ProductFilters({
                         {t('clear')}
                     </Button>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 p-4 pt-0 sm:p-6 sm:pt-0">
                     {/* Price Range */}
                     <div className="space-y-4">
                         <Label className="text-sm font-semibold">{t('priceRange')}</Label>
@@ -163,7 +163,7 @@ export function ProductFilters({
                             <Label className="text-sm font-semibold">{t('manufacturers')}</Label>
                             <div className="space-y-2 max-h-48 overflow-y-auto">
                                 {manufacturers.map(manufacturer => (
-                                    <div key={manufacturer.id} className="flex items-center space-x-2">
+                                    <div key={manufacturer.id} className="flex min-w-0 items-center gap-2">
                                         <Checkbox
                                             id={`manufacturer-${manufacturer.id}`}
                                             checked={selectedManufacturers.includes(manufacturer.id)}
@@ -171,7 +171,7 @@ export function ProductFilters({
                                         />
                                         <Label
                                             htmlFor={`manufacturer-${manufacturer.id}`}
-                                            className="text-sm font-normal cursor-pointer"
+                                            className="min-w-0 cursor-pointer text-sm font-normal"
                                         >
                                             {manufacturer.name}
                                         </Label>
@@ -187,7 +187,7 @@ export function ProductFilters({
                             <Label className="text-sm font-semibold">{t('productTypes')}</Label>
                             <div className="space-y-2">
                                 {productTypes.map(type => (
-                                    <div key={type.id} className="flex items-center space-x-2">
+                                    <div key={type.id} className="flex min-w-0 items-center gap-2">
                                         <Checkbox
                                             id={`type-${type.id}`}
                                             checked={selectedProductTypes.includes(type.id)}
@@ -195,7 +195,7 @@ export function ProductFilters({
                                         />
                                         <Label
                                             htmlFor={`type-${type.id}`}
-                                            className="text-sm font-normal cursor-pointer"
+                                            className="min-w-0 cursor-pointer text-sm font-normal"
                                         >
                                             {type.name}
                                         </Label>
@@ -207,7 +207,7 @@ export function ProductFilters({
 
                     {/* In Stock Only */}
                     <div className="space-y-3">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex min-w-0 items-center gap-2">
                             <Checkbox
                                 id="in-stock-only"
                                 checked={inStockOnly}

@@ -7,14 +7,13 @@ import { useTranslations } from "next-intl"
 import { useCart } from "@/context/CartContext"
 import { useManufacturers } from "@/hooks/useManufacturers"
 import { useProducts } from "@/hooks/useProducts"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ShoppingCart, ArrowLeft, Package, Tag, Layers } from "lucide-react"
 import Image from "next/image"
-import { cn } from "@/lib/utils"
 
 interface ProductDetails {
     id: number
@@ -156,11 +155,11 @@ export default function ProductPage() {
     }
 
     return (
-        <div className="min-h-screen bg-surface py-12 px-4 md:px-28 max-w-screen-3xl mx-auto">
+        <div className="mx-auto min-h-screen max-w-screen-3xl bg-surface px-4 py-8 sm:py-10 md:px-8 lg:px-28 lg:py-12">
             <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="mb-12"
+                className="mb-6 sm:mb-10 lg:mb-12"
             >
                 <Button variant="ghost" onClick={() => router.back()} className="rounded-full px-6 glass hover:bg-surface-container-low transition-all">
                     <ArrowLeft className="h-4 w-4 me-2" />
@@ -168,7 +167,7 @@ export default function ProductPage() {
                 </Button>
             </motion.div>
 
-            <div className="grid lg:grid-cols-12 gap-12 items-start">
+            <div className="grid items-start gap-8 lg:grid-cols-12 lg:gap-12">
                 {/* Left Column: The Visual Focus */}
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -176,14 +175,14 @@ export default function ProductPage() {
                     transition={{ duration: 0.6 }}
                     className="lg:col-span-7"
                 >
-                    <div className="relative aspect-[4/5] rounded-[4rem] overflow-hidden bg-surface-container-low shadow-2xl group">
+                    <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-surface-container-low shadow-xl sm:rounded-[2rem] lg:rounded-[4rem] lg:shadow-2xl">
                         {product.imageUrl ? (
                             <Image
                                 src={product.imageUrl}
                                 alt={product.name}
                                 fill
                                 unoptimized
-                                className="object-cover p-4 transition-transform duration-700 group-hover:scale-110"
+                                className="object-contain p-3 transition-transform duration-700 group-hover:scale-105 sm:p-4"
                                 sizes="(max-width: 1024px) 100vw, 60vw"
                                 priority
                             />
@@ -192,9 +191,9 @@ export default function ProductPage() {
                                 <Package className="h-32 w-32 text-muted-foreground/20" />
                             </div>
                         )}
-                        <div className="absolute bottom-8 left-8 right-8 p-6 glass backdrop-blur-md rounded-3xl text-white/90 pointer-events-none">
-                            <p className="text-sm font-medium italic opacity-80 mb-1">Curator&apos;s Note</p>
-                            <p className="text-lg font-serif leading-tight">
+                        <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-black/45 p-3 text-white/90 backdrop-blur-md pointer-events-none sm:inset-x-6 sm:bottom-6 sm:p-5 lg:inset-x-8 lg:bottom-8 lg:rounded-3xl lg:p-6">
+                            <p className="mb-1 text-xs font-medium italic opacity-80 sm:text-sm">Curator&apos;s Note</p>
+                            <p className="line-clamp-3 text-sm font-serif leading-tight sm:text-base lg:text-lg">
                                 A timeless addition to any curated space, blending organic form with refined function.
                             </p>
                         </div>
@@ -206,11 +205,11 @@ export default function ProductPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="lg:col-span-5 space-y-10"
+                    className="space-y-6 lg:col-span-5 lg:space-y-10"
                 >
                     <div className="space-y-6">
-                        <div className="flex items-start justify-between gap-4">
-                            <h1 className="text-4xl md:text-6xl font-serif text-foreground tracking-tight leading-tight">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                            <h1 className="text-3xl font-serif leading-tight text-foreground sm:text-4xl md:text-6xl">
                                 {product.name}
                             </h1>
                             {manufacturer && (
@@ -220,7 +219,7 @@ export default function ProductPage() {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-4 text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-3 text-muted-foreground sm:gap-4">
                             <span className="flex items-center gap-1 text-sm">
                                 <Tag className="h-3 w-3" />
                                 {t('sku')}: {product.sku}
@@ -229,12 +228,12 @@ export default function ProductPage() {
                             <span className="text-sm">#{product.id}</span>
                         </div>
 
-                        <div className="text-4xl md:text-5xl font-serif text-primary font-bold">
+                        <div className="text-3xl font-serif font-bold text-primary sm:text-4xl md:text-5xl">
                             {tProducts('currency')} {parseFloat(product.price).toFixed(2)}
                         </div>
                     </div>
 
-                    <div className="space-y-8 p-8 rounded-[3rem] bg-surface-container-low/50 backdrop-blur-sm border border-white/20">
+                    <div className="space-y-6 rounded-2xl border border-white/20 bg-surface-container-low/50 p-4 backdrop-blur-sm sm:p-6 lg:space-y-8 lg:rounded-[3rem] lg:p-8">
                         <div>
                             <h3 className="text-xl font-serif mb-6 flex items-center gap-3">
                                 <Layers className="h-5 w-5 text-primary" />
@@ -243,7 +242,7 @@ export default function ProductPage() {
                             {product.specs && Object.keys(product.specs).length > 0 ? (
                                 <div className="grid grid-cols-1 gap-4">
                                     {Object.entries(product.specs).map(([key, value]) => (
-                                        <div key={key} className="flex justify-between items-center py-3 border-b border-surface-container-low">
+                                        <div key={key} className="flex flex-col gap-1 border-b border-surface-container-low py-3 sm:flex-row sm:items-center sm:justify-between">
                                             <span className="text-muted-foreground capitalize text-sm">
                                                 {key.replace(/_/g, ' ')}
                                             </span>
@@ -258,7 +257,7 @@ export default function ProductPage() {
 
                         <div className="pt-6">
                             <Button
-                                className="w-full h-16 text-lg rounded-full transition-all duration-300 hover:scale-[1.02] active:scale-95"
+                                className="h-14 w-full rounded-full text-base transition-all duration-300 hover:scale-[1.01] active:scale-95 sm:h-16 sm:text-lg"
                                 disabled={isAdding || product.isPurchasable === false}
                                 variant={product.isPurchasable === false ? "secondary" : "default"}
                                 onClick={() => addToCart(product.id)}
@@ -278,12 +277,12 @@ export default function ProductPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-6 rounded-3xl bg-surface-container-low/30 text-center">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                        <div className="rounded-2xl bg-surface-container-low/30 p-4 text-center sm:rounded-3xl sm:p-6">
                             <p className="text-xs text-muted-foreground mb-1">{t('category')}</p>
                             <p className="font-medium text-sm">{product.category.name}</p>
                         </div>
-                        <div className="p-6 rounded-3xl bg-surface-container-low/30 text-center">
+                        <div className="rounded-2xl bg-surface-container-low/30 p-4 text-center sm:rounded-3xl sm:p-6">
                             <p className="text-xs text-muted-foreground mb-1">{t('productType')}</p>
                             <p className="font-medium text-sm">{product.productType.name}</p>
                         </div>

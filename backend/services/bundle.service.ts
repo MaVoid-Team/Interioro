@@ -68,6 +68,7 @@ class BundleService {
     // If pagination params provided, use them
     const options: any = {
       where,
+      distinct: true,
       include: [
         {
           model: BundleProduct,

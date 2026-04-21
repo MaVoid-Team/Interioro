@@ -10,6 +10,7 @@
         "products": "المنتجات",
         "bundles": "الحزم",
         "categories": "التصنيفات",
+        "designServices": "خدمات التصميم",
         "orders": "طلباتي",
         "search": "بحث",
         "cart": "عربة التسوق",
@@ -86,6 +87,7 @@
         "home": "الرئيسية",
         "products": "المنتجات",
         "categories": "التصنيفات",
+        "designServices": "خدمات التصميم",
         "profile": "حسابي"
     },
     "Auth": {
@@ -634,6 +636,10 @@
         "productTypes": "أنواع المنتجات",
         "locations": "مواقع التوصيل",
         "promoCodes": "أكواد الخصم",
+        "portfolio": "معرض الأعمال",
+        "customRequests": "الطلبات المخصصة",
+        "specialPieces": "القطع الخاصة",
+        "consultations": "الاستشارات",
         "login": "تسجيل الدخول",
         "logout": "تسجيل الخروج",
         "backToStore": "العودة للمتجر",

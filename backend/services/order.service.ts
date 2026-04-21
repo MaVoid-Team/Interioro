@@ -1,4 +1,4 @@
-import { Op, Transaction } from "sequelize";
+import { Op, Transaction, col, cast, where as sequelizeWhere } from "sequelize";
 import sequelize from "../config/database";
 import type { OrderStatus, PaymentStatus } from "../types/Order";
 import {
@@ -22,6 +22,7 @@ import { ProductService } from "./product.service";
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100;
 const productService = new ProductService();
+const escapeLikePattern = (value: string) => value.replace(/[\\%_]/g, "\\$&");
 
 interface OrderFilters {
   userId?: number;
@@ -351,7 +352,7 @@ export class OrderService {
 
   async listOrders(page = 1, limit = 10, filters: OrderFilters = {}) {
     const offset = (page - 1) * limit;
-    const where: any = {};
+    const where: Record<string | symbol, unknown> = {};
 
     if (filters.userId) {
       where.userId = filters.userId;
@@ -364,13 +365,19 @@ export class OrderService {
     // Global search across order ID and user email using raw SQL for OR across tables
     if (filters.search) {
       const searchTerm = filters.search.trim();
-      // Escape special characters for LIKE pattern
-      const escapedSearch = searchTerm.replace(/[%_]/g, '\\$&');
+      const escapedSearch = escapeLikePattern(searchTerm);
+      const likePattern = `%${escapedSearch}%`;
 
-      // Use Sequelize.literal for cross-table OR condition
-      where[Op.and] = sequelize.literal(
-        `("Order"."id"::text ILIKE '%${escapedSearch}%' OR "user"."email" ILIKE '%${escapedSearch}%')`
-      );
+      where[Op.or] = [
+        sequelizeWhere(cast(col("Order.id"), "TEXT"), {
+          [Op.iLike]: likePattern,
+        }),
+        {
+          "$user.email$": {
+            [Op.iLike]: likePattern,
+          },
+        },
+      ];
     }
 
     if (filters.period && filters.period !== "all") {

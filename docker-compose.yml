@@ -1,52 +1,87 @@
 services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:?set DB_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASS:?set DB_PASS in .env}
+      POSTGRES_DB: ${DB_NAME:?set DB_NAME in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - interioro
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     environment:
+      NODE_ENV: production
+      PORT: 3000
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USER: interioro
-      DB_PASS: w3uRU[{0960n
-      DB_NAME: interioro_db
-      PORT: 3000
-      CLOUDINARY_CLOUD_NAME: dv4enxyxo
-      CLOUDINARY_API_KEY: 964321319365178
-      CLOUDINARY_API_SECRET: VA9YILM1doEIcCpXPwZMrSk8bAQ
-      PAYMOB_API_KEY: ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdh$
-      PAYMOB_SECRET_KEY: egy_sk_live_706fccc91d8f2d3ad42fd61b28dd99f550f435318c0c57cf3bb55dc849d9b9b0
-      PAYMOB_PUBLIC_KEY: egy_pk_live_mPI3bAsuoEjeZDcqNfWotMc6KcDIUga1
-      PAYMOB_INTEGRATION_ID: 5261462
-      PAYMOB_INTEGRATION_ID_WALLET: 5261461
-      PAYMOB_IFRAME_ID: 875103
-      PAYMOB_HMAC_SECRET: 9D9B6EACB69C3045F83B17E5F1D6DC60
+      DB_USER: ${DB_USER:?set DB_USER in .env}
+      DB_PASS: ${DB_PASS:?set DB_PASS in .env}
+      DB_NAME: ${DB_NAME:?set DB_NAME in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      FRONTEND_URL: ${FRONTEND_URL:?set FRONTEND_URL in .env}
+      BACKEND_URL: ${BACKEND_URL:?set BACKEND_URL in .env}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:?set CLOUDINARY_CLOUD_NAME in .env}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:?set CLOUDINARY_API_KEY in .env}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:?set CLOUDINARY_API_SECRET in .env}
+      PAYMOB_SECRET_KEY: ${PAYMOB_SECRET_KEY:?set PAYMOB_SECRET_KEY in .env}
+      PAYMOB_PUBLIC_KEY: ${PAYMOB_PUBLIC_KEY:?set PAYMOB_PUBLIC_KEY in .env}
+      PAYMOB_INTEGRATION_ID: ${PAYMOB_INTEGRATION_ID:?set PAYMOB_INTEGRATION_ID in .env}
+      PAYMOB_INTEGRATION_ID_WALLET: ${PAYMOB_INTEGRATION_ID_WALLET:-}
+      PAYMOB_IFRAME_ID: ${PAYMOB_IFRAME_ID:-}
+      PAYMOB_HMAC_SECRET: ${PAYMOB_HMAC_SECRET:?set PAYMOB_HMAC_SECRET in .env}
     ports:
-      - "3397:3000"
+      - "127.0.0.1:${BACKEND_PORT:-3397}:3000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
+    networks:
+      - interioro
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    depends_on:
-      - backend
-    ports:
-      - "9719:3000"
-    restart: unless-stopped
-
-  postgres:
-    image: postgres:18-alpine
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:3000}
     environment:
-      POSTGRES_USER: interioro
-      POSTGRES_PASSWORD: w3uRU[{0960n
-      POSTGRES_DB: interioro_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:3000}
+    depends_on:
+      backend:
+        condition: service_healthy
     ports:
-      - "5396:5432"
+      - "127.0.0.1:${FRONTEND_PORT:-9719}:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
+    networks:
+      - interioro
 
 volumes:
   postgres_data:
+
+networks:
+  interioro:
+    driver: bridge

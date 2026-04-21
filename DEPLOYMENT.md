@@ -1,73 +1,178 @@
-# Container Deployment Guide
+# VPS Docker Deployment Guide
 
-This repo now ships production-ready Dockerfiles for the backend API and the Next.js frontend, plus a root `docker-compose.yml` that orchestrates both. Nginx is expected to run directly on the VPS host, so the compose stack only contains the app services.
+This project deploys as three Docker services behind host-level Nginx:
 
-## Prerequisites
+- `frontend`: Next.js app on internal container port `3000`, bound to `127.0.0.1:9719` by default.
+- `backend`: Express API on internal container port `3000`, bound to `127.0.0.1:3397` by default.
+- `postgres`: PostgreSQL on a private Docker network, not exposed to the VPS host.
 
-- Docker Engine 24+
-- Docker Compose V2 (`docker compose` CLI)
-- A PostgreSQL instance reachable from the backend container
-- Cloudinary + JWT + DB credentials stored outside of source control
+Nginx terminates HTTPS on the VPS and proxies web traffic to the frontend and `/api/v1/*` traffic to the backend.
 
-## Environment Variables
+## Important Security Note
 
-Create a `backend/.env` file (or update the existing one) with everything the Express app requires, for example:
+The previous `docker-compose.yml` contained live-looking database, Cloudinary, and Paymob credentials. I removed those from Compose, but any credential that has been committed or shared should be treated as exposed. Rotate those secrets before using this deployment in production.
 
-```
-PORT=3000
-DB_HOST=postgres.internal
-DB_NAME=interioro
-DB_USER=interioro
-DB_PASS=supersecret
-JWT_SECRET=change-me
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-```
+## Step 1/7: Prepare The VPS
 
-The frontend only needs a public API URL. By default the compose file injects the internal service URL (`http://backend:3000/api/v1`). Override it in a host `.env` file placed next to `docker-compose.yml` if you need something else:
-
-```
-NEXT_PUBLIC_API_URL=https://api.interioro.example.com/api/v1
-FRONTEND_PORT=8080
-BACKEND_PORT=4000
-```
-
-## Build & Run
+On a fresh Ubuntu VPS:
 
 ```bash
-# from repo root
+sudo ./setup-docker.sh
+```
+
+The script installs Docker Engine, Docker Compose V2, Nginx, Certbot, and basic firewall rules. If you install manually, make sure these commands work:
+
+```bash
+docker --version
+docker compose version
+nginx -v
+certbot --version
+```
+
+## Step 2/7: Configure Environment
+
+From the repo root on the VPS:
+
+```bash
+cp .env.example .env
+chmod 600 .env
+openssl rand -base64 48
+```
+
+Edit `.env` and replace every placeholder.
+
+Key values:
+
+| Variable | Production value |
+| --- | --- |
+| `FRONTEND_URL` | `https://your-domain.com` |
+| `BACKEND_URL` | `https://your-domain.com/api/v1` |
+| `NEXT_PUBLIC_API_URL` | `http://backend:3000` |
+| `DB_PASS` | Long random password |
+| `JWT_SECRET` | Output from `openssl rand -base64 48` |
+
+Do not add `/api/v1` to `NEXT_PUBLIC_API_URL`; the Next.js route handlers already append it.
+
+## Step 3/7: Validate Compose
+
+```bash
+docker compose config
+```
+
+If this fails, the error usually points to a missing required `.env` variable.
+
+## Step 4/7: Build And Start
+
+```bash
 docker compose build
-
-# run migrations before starting backend
-docker compose run --rm backend npx sequelize-cli db:migrate
-
-# start services in detached mode
 docker compose up -d
+docker compose ps
 ```
 
-- Backend container listens on port `3000` internally and is mapped to `${BACKEND_PORT:-3000}` on the host.
-- Frontend container listens on `3000` internally and is mapped to `${FRONTEND_PORT:-3001}` on the host.
-- Point your host-level Nginx to these ports for TLS termination / routing.
-
-## Useful Commands
+The backend entrypoint runs Sequelize migrations before starting `node dist/server.js`. Check logs after the first start:
 
 ```bash
-# View logs
+docker compose logs -f postgres
 docker compose logs -f backend
-
 docker compose logs -f frontend
-
-# Rebuild after code changes
-docker compose build backend
-
-# Stop & remove containers
-docker compose down
 ```
 
-## Notes
+## Step 5/7: Configure Nginx
 
-- `backend/Dockerfile` compiles TypeScript, installs only production dependencies, and runs `node dist/server.js`.
-- `frontend/Dockerfile` builds the Next.js app and serves it via `next start`.
-- Make sure the database and any third-party services are accessible from the containers (open firewall, allow hostnames, etc.).
-- Always run migrations (`docker compose run --rm backend npx sequelize-cli db:migrate`) before starting or restarting the backend container to keep schema in sync.
+```bash
+sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/interioro
+sudo sed -i 's/example.com/your-domain.com/g' /etc/nginx/sites-available/interioro
+sudo ln -s /etc/nginx/sites-available/interioro /etc/nginx/sites-enabled/interioro
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+If your `.env` uses different host ports, update the upstream ports in the Nginx file.
+
+## Step 6/7: Enable HTTPS
+
+```bash
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+sudo certbot renew --dry-run
+```
+
+After Certbot succeeds:
+
+```bash
+curl -I https://your-domain.com
+curl -I https://your-domain.com/health
+```
+
+## Step 7/7: Deploy Updates
+
+```bash
+git pull
+docker compose build
+docker compose up -d
+docker compose ps
+docker compose logs --tail=200 backend frontend
+```
+
+## Backups
+
+Create a database backup:
+
+```bash
+set -a
+. ./.env
+set +a
+mkdir -p /opt/backups/interioro
+docker compose exec -T postgres pg_dump -U "$DB_USER" "$DB_NAME" > "/opt/backups/interioro/interioro-$(date +%F-%H%M%S).sql"
+```
+
+Restore into an empty database only after testing on a staging copy:
+
+```bash
+set -a
+. ./.env
+set +a
+docker compose exec -T postgres psql -U "$DB_USER" "$DB_NAME" < backup.sql
+```
+
+## Troubleshooting
+
+### `docker compose config` reports a missing variable
+
+Open `.env` and fill the named variable. Required variables use Compose's `:?` validation.
+
+### Backend exits during startup
+
+Check database and migration logs:
+
+```bash
+docker compose logs --tail=200 postgres
+docker compose logs --tail=200 backend
+```
+
+Common causes are wrong `DB_*` values, failed migrations, or a reused Postgres volume with incompatible credentials.
+
+### Nginx returns 502
+
+Confirm the app ports are listening on localhost:
+
+```bash
+docker compose ps
+ss -tulpn | grep -E '3397|9719'
+```
+
+Then test directly from the VPS:
+
+```bash
+curl http://127.0.0.1:3397/health
+curl http://127.0.0.1:9719
+```
+
+### Paymob callback fails
+
+Confirm `BACKEND_URL` is the public HTTPS API base, for example:
+
+```env
+BACKEND_URL=https://your-domain.com/api/v1
+```
+
+The payment provider cannot reach Docker-internal hostnames.

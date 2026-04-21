@@ -49,7 +49,7 @@ export interface Order {
     shipping: string
     tax: string
     total: string
-    metadata: any
+    metadata: Record<string, unknown> | null
     placedAt: string
     createdAt: string
     updatedAt: string
@@ -210,6 +210,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     }, [isAuthenticated, token, t, router, fetchCart])
 
+    const removeCartItem = useCallback(async (itemId: number, itemType: 'product' | 'bundle' = 'product') => {
+        if (!token) return false
+
+        setIsLoading(true)
+        try {
+            const response = await fetch(`/api/cart/items/${itemId}?type=${itemType}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+
+            if (response.ok) {
+                await fetchCart()
+                toast.success(t('itemRemoved'))
+                return true
+            }
+
+            toast.error(t('removeFailed'))
+            return false
+        } catch (error) {
+            console.error('Failed to remove item:', error)
+            toast.error(t('removeFailed'))
+            return false
+        } finally {
+            setIsLoading(false)
+        }
+    }, [token, t, fetchCart])
+
     /**
      * Update item quantity (supports both products and bundles)
      */
@@ -217,18 +246,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (!token) return false
 
         if (newQuantity < 1) {
-            return await removeItem(itemId, itemType)
+            return removeCartItem(itemId, itemType)
         }
 
         setIsLoading(true)
         try {
-            const response = await fetch(`/api/cart/items/${itemId}`, {
+            const response = await fetch(`/api/cart/items/${itemId}?type=${itemType}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ quantity: newQuantity, itemType }),
+                body: JSON.stringify({ quantity: newQuantity }),
             })
 
             if (response.ok) {
@@ -246,39 +275,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setIsLoading(false)
         }
-    }, [token, t, fetchCart])
+    }, [token, t, fetchCart, removeCartItem])
 
     /**
      * Remove item from cart (supports both products and bundles)
      */
     const removeItem = useCallback(async (itemId: number, itemType: 'product' | 'bundle' = 'product') => {
-        if (!token) return false
-
-        setIsLoading(true)
-        try {
-            const response = await fetch(`/api/cart/items/${itemId}?itemType=${itemType}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            })
-
-            if (response.ok) {
-                await fetchCart()
-                toast.success(t('itemRemoved'))
-                return true
-            } else {
-                toast.error(t('removeFailed'))
-                return false
-            }
-        } catch (error) {
-            console.error('Failed to remove item:', error)
-            toast.error(t('removeFailed'))
-            return false
-        } finally {
-            setIsLoading(false)
-        }
-    }, [token, t, fetchCart])
+        return removeCartItem(itemId, itemType)
+    }, [removeCartItem])
 
     /**
      * Clear entire cart
@@ -325,7 +329,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 },
             })
 
-            if (response.ok) {
+            if (response.ok || response.status === 400) {
                 const data = await response.json()
                 return data
             }

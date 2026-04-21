@@ -35,11 +35,11 @@ export function JustArrived() {
 
     if (isLoading) {
         return (
-            <section className="py-20 bg-surface">
-                <div className="container max-w-screen-xl px-6">
+            <section className="bg-surface py-12 sm:py-20">
+                <div className="container max-w-screen-xl px-4 sm:px-6">
                     <div className="mb-12">
                         <Skeleton className="h-12 w-64 mb-4" />
-                        <Skeleton className="h-6 w-96" />
+                        <Skeleton className="h-6 w-full max-w-96" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         {[...Array(4)].map((_, i) => (
@@ -54,15 +54,15 @@ export function JustArrived() {
     if (products.length === 0) return null
 
     return (
-        <section className="py-24 bg-surface overflow-hidden">
-            <div className="container max-w-screen-xl px-6">
+        <section className="overflow-hidden bg-surface py-14 sm:py-20 lg:py-24">
+            <div className="container max-w-screen-xl px-4 sm:px-6">
                 {/* Editorial Header */}
-                <div className={`flex flex-col ${isRtl ? 'items-end text-end' : 'items-start text-start'} mb-16`}>
+                <div className={`mb-8 flex flex-col sm:mb-12 lg:mb-16 ${isRtl ? 'items-end text-end' : 'items-start text-start'}`}>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-4xl md:text-6xl font-serif font-bold tracking-tighter text-foreground mb-4"
+                        className="mb-3 text-3xl font-serif font-bold leading-tight text-foreground sm:text-4xl md:text-6xl"
                     >
                         {t('title')}
                     </motion.h2>
@@ -71,14 +71,14 @@ export function JustArrived() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="text-lg text-muted-foreground max-w-xl leading-relaxed font-sans"
+                        className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
                     >
                         {t('description')}
                     </motion.p>
                 </div>
 
                 {/* Asymmetric Curated Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-12 md:gap-6">
                     {products.slice(0, 5).map((product, i) => {
                         // Create asymmetric layout: 1st product is large, others vary
                         const isMain = i === 0;
@@ -93,7 +93,7 @@ export function JustArrived() {
                                 transition={{ delay: i * 0.1, type: "spring", stiffness: 100, damping: 20 }}
                                 className={cn(
                                     "relative",
-                                    isMain ? "md:col-span-7" : isMedium ? "md:col-span-5" : "md:col-span-4"
+                                    isMain ? "sm:col-span-2 md:col-span-7" : isMedium ? "md:col-span-5" : "md:col-span-4"
                                 )}
                             >
                                 <div className="h-full">
@@ -108,8 +108,8 @@ export function JustArrived() {
                     })}
                 </div>
 
-                <div className={`flex ${isRtl ? 'justify-end' : 'justify-start'} mt-16`}>
-                    <Button variant="outline" size="lg" className="rounded-full px-8 group">
+                <div className={`mt-10 flex ${isRtl ? 'justify-end' : 'justify-start'} sm:mt-16`}>
+                    <Button variant="outline" size="lg" className="group w-full rounded-full px-6 sm:w-auto sm:px-8">
                         Explore All New Arrivals
                         <ArrowRight className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>

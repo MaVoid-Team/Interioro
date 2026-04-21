@@ -47,6 +47,7 @@ export default function AdminOrdersPage() {
 
     const handleSearchChange = (value: string) => {
         setSearchQuery(value)
+        setPage(1)
     }
 
     const handleStatusChange = (value: string) => {
@@ -58,25 +59,32 @@ export default function AdminOrdersPage() {
         setRefreshKey(prev => prev + 1)
     }, [])
 
-    // Reset to first page when search changes
-    useEffect(() => {
-        setPage(1)
-    }, [debouncedSearch])
-
-    useEffect(() => {
-        fetchOrders()
-    }, [page, debouncedSearch, statusFilter, refreshKey])
-
-    const fetchOrders = async () => {
-        const response = await getAllOrders(page, limit, {
+    const fetchOrders = useCallback(() => {
+        return getAllOrders(page, limit, {
             search: debouncedSearch || undefined,
             status: statusFilter !== "all" ? statusFilter : undefined,
         })
-        if (response) {
+    }, [debouncedSearch, getAllOrders, limit, page, statusFilter])
+
+    useEffect(() => {
+        let isMounted = true
+
+        const loadOrders = async () => {
+            const response = await fetchOrders()
+            if (!isMounted || !response) {
+                return
+            }
+
             setOrders(response.data)
             setTotalPages(response.meta.totalPages)
         }
-    }
+
+        void loadOrders()
+
+        return () => {
+            isMounted = false
+        }
+    }, [fetchOrders, refreshKey])
 
     const statusColors: Record<string, string> = {
         pending: "bg-muted text-muted-foreground",
@@ -188,7 +196,7 @@ export default function AdminOrdersPage() {
                                             </Badge>
                                         </TableCell>
                                         <TableCell className={`font-semibold ${isRtl ? "text-right" : "text-left"}`}>
-                                            {parseFloat(order.total).toLocaleString()} {t("currency")}
+                                            {order.total.toLocaleString()} {t("currency")}
                                         </TableCell>
                                         <TableCell className="text-end">
                                             <div className="flex justify-end">

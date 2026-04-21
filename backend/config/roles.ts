@@ -14,7 +14,8 @@ ac.grant("customer")
   // Public permissions for new features
   .readAny("location")
   .readAny("bundle")
-  .readAny("discount");
+  .readAny("discount")
+  .readAny("portfolioProject");
 
 ac.grant("admin")
   .extend("customer") // Inherits customer rights
@@ -39,6 +40,15 @@ ac.grant("admin")
   .deleteAny("bundle")
   .createAny("discount")
   .updateAny("discount")
-  .deleteAny("discount");
+  .deleteAny("discount")
+  .createAny("portfolioProject")
+  .updateAny("portfolioProject")
+  .deleteAny("portfolioProject")
+  .readAny("customDesignRequest")
+  .updateAny("customDesignRequest")
+  .readAny("specialPieceRequest")
+  .updateAny("specialPieceRequest")
+  .readAny("consultationRequest")
+  .updateAny("consultationRequest");
 
 export default ac;

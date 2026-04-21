@@ -219,7 +219,7 @@ export class CartController {
   checkout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req.user as any).id;
-      const { paymentType = "cash", locationId, addressId, discountCode, billingData } = req.body;
+      const { paymentType = "cash", locationId, addressId, discountCode, billingData, locale } = req.body;
 
       // Validate payment type
       if (!["cash", "card"].includes(paymentType)) {
@@ -323,6 +323,7 @@ export class CartController {
       // Get URLs for callbacks
       const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
       const backendUrl = process.env.BACKEND_URL || "http://localhost:3001/api/v1";
+      const resolvedLocale = locale === "en" ? "en" : "ar";
 
       // Encode locationId and discountCode in special_reference
       const checkoutData = {
@@ -336,7 +337,7 @@ export class CartController {
 
       const intention = await paymobService.createPaymentIntention({
         amount: amountCents,
-        currency: "EGP",
+        currency: "SAR",
         items: paymobItems,
         billing_data: {
           first_name: billingData.firstName,
@@ -350,7 +351,7 @@ export class CartController {
         },
         special_reference: encodedData,
         notification_url: `${backendUrl}/webhooks/paymob/callback`,
-        redirection_url: `${frontendUrl}/checkout/success`,
+        redirection_url: `${frontendUrl}/${resolvedLocale}/checkout/success`,
       });
 
       const checkoutUrl = paymobService.generateCheckoutUrl(intention.client_secret);

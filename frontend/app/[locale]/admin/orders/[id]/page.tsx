@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { useRouter } from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
-import { useOrders } from "@/hooks/useOrders"
+import { type Order, useOrders } from "@/hooks/useOrders"
 import { OrderDetails } from "@/components/orders/OrderDetails"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, RefreshCw } from "lucide-react"
@@ -17,19 +17,29 @@ export default function AdminOrderDetailsPage() {
     const orderId = parseInt(params.id as string)
     const { getAdminOrderById, updateOrder, isLoading } = useOrders()
 
-    const [order, setOrder] = useState<any>(null)
+    const [order, setOrder] = useState<Order | null>(null)
     const [refreshKey, setRefreshKey] = useState(0)
 
-    const fetchOrder = useCallback(async () => {
-        const data = await getAdminOrderById(orderId)
-        if (data) {
-            setOrder(data)
-        }
+    const fetchOrder = useCallback(() => {
+        return getAdminOrderById(orderId)
     }, [getAdminOrderById, orderId])
 
     useEffect(() => {
-        fetchOrder()
-    }, [orderId, refreshKey])
+        let isMounted = true
+
+        const loadOrder = async () => {
+            const data = await fetchOrder()
+            if (isMounted) {
+                setOrder(data)
+            }
+        }
+
+        void loadOrder()
+
+        return () => {
+            isMounted = false
+        }
+    }, [fetchOrder, refreshKey])
 
     const handleStatusUpdate = async (orderId: number, status: string, paymentStatus?: string) => {
         const updates: { status?: string; paymentStatus?: string } = {}

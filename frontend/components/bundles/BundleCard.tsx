@@ -43,11 +43,11 @@ export function BundleCard({
 
     return (
         <div className={cn(
-            "flex flex-col h-full bg-card group overflow-hidden transition-all duration-300 hover:shadow-lg rounded-xl border",
+            "flex h-full min-w-0 flex-col overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:shadow-lg",
             className
         )}>
             {/* Image Section */}
-            <div className="bg-muted flex items-center justify-center relative overflow-hidden aspect-4/5 w-full">
+            <div className="relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden bg-muted">
                 {bundle.imageUrl ? (
                     <Image
                         src={bundle.imageUrl}
@@ -74,7 +74,7 @@ export function BundleCard({
                 )}
             </div>
 
-            <div className="flex flex-1 flex-col p-2.5 sm:p-4 h-full">
+            <div className="flex h-full min-w-0 flex-1 flex-col p-3 sm:p-4">
                 {/* Header */}
                 <div className="flex-1 space-y-2">
                     <h3 className="font-semibold text-sm sm:text-base md:text-lg line-clamp-2 leading-tight">
@@ -86,10 +86,10 @@ export function BundleCard({
                     </p>
 
                     {/* Bundle Items Summary */}
-                    <div className="pt-2 flex flex-wrap gap-1">
+                    <div className="flex max-h-14 flex-wrap gap-1 overflow-hidden pt-2">
                         {bundle.BundleProducts?.slice(0, 3).map((item, idx) => (
                             <Badge key={idx} variant="outline" className="text-[10px] px-1.5 h-5 font-normal text-muted-foreground">
-                                {item.quantity}x {item.Product.name}
+                                <span className="truncate">{item.quantity}x {item.Product.name}</span>
                             </Badge>
                         ))}
                         {bundle.BundleProducts?.length > 3 && (
@@ -101,8 +101,8 @@ export function BundleCard({
                 </div>
 
                 {/* Footer - Price and Action */}
-                <div className="mt-3 sm:mt-4 pt-3 border-t flex items-center justify-between gap-2 sm:gap-3">
-                    <div className="flex flex-col">
+                <div className="mt-3 flex flex-col gap-3 border-t pt-3 sm:mt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 flex-col">
                         {savings > 0 && (
                             <span className="text-xs text-muted-foreground line-through">
                                 {tCommon('currency')} {totalOriginalPrice.toFixed(2)}
@@ -117,14 +117,14 @@ export function BundleCard({
                         size="sm"
                         disabled={!bundle.active || isAdding}
                         onClick={handleAddToCart}
-                        className="shrink-0 text-xs sm:text-sm px-2 sm:px-3"
+                        className="w-full shrink-0 px-2 text-xs sm:w-auto sm:px-3 sm:text-sm"
                     >
                         {isAdding ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                             <>
-                                <ShoppingCart className="h-4 w-4 me-1 sm:me-2" />
-                                {tCommon('addToCart')}
+                                <ShoppingCart className="h-4 w-4 shrink-0 me-1 sm:me-2" />
+                                <span className="truncate">{tCommon('addToCart')}</span>
                             </>
                         )}
                     </Button>

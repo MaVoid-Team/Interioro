@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { useTranslations, useLocale } from "next-intl"
+import { useTranslations } from "next-intl"
 import { Package, MapPin, CreditCard, Calendar, User, Tag, Truck } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect } from "react"
@@ -44,7 +44,7 @@ interface Order {
         discountAmount?: number
         discountCodeId?: number
         addressId?: number
-    }
+    } | null
     location?: {
         id: number
         name: string
@@ -77,8 +77,6 @@ interface OrderDetailsProps {
 
 export function OrderDetails({ order, isAdmin = false, onStatusUpdate, onOrderUpdated }: OrderDetailsProps) {
     const t = useTranslations("OrderDetails")
-    const locale = useLocale()
-    const isRtl = locale === "ar"
     const [isUpdating, setIsUpdating] = useState(false)
     const [selectedStatus, setSelectedStatus] = useState(order.status)
     const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(order.paymentStatus || "unpaid")
@@ -115,7 +113,7 @@ export function OrderDetails({ order, isAdmin = false, onStatusUpdate, onOrderUp
             await onStatusUpdate(order.id, selectedStatus, selectedPaymentStatus)
             toast.success(t("statusUpdated"))
             onOrderUpdated?.()
-        } catch (error) {
+        } catch {
             toast.error(t("statusUpdateFailed"))
         } finally {
             setIsUpdating(false)

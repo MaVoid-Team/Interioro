@@ -121,7 +121,7 @@ export function AllBundles({
 
     if (isLoading && bundles.length === 0) {
         return (
-            <div className="max-w-screen-3xl py-8 px-4 md:px-8 lg:px-28">
+            <div className="mx-auto max-w-screen-3xl px-4 py-8 md:px-8 lg:px-28">
                 <div className="flex flex-col gap-6 mb-8">
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                         {title || tBundles('title')}
@@ -133,10 +133,10 @@ export function AllBundles({
     }
 
     return (
-        <div className="max-w-screen-3xl py-8 px-4 md:px-8 lg:px-28">
+        <div className="mx-auto max-w-screen-3xl px-4 py-8 md:px-8 lg:px-28">
             {/* Header Section */}
             <div className="flex flex-col gap-6 mb-8">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     {showTitle && (
                         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                             {title || tBundles('title')}
@@ -188,7 +188,7 @@ export function AllBundles({
                     Showing {bundles.length} results
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {bundles.map(bundle => (
                         <BundleCard
                             key={bundle.id}
@@ -207,7 +207,7 @@ export function AllBundles({
                 {totalPages > 1 && (
                     <div className="mt-8">
                         <Pagination>
-                            <PaginationContent>
+                            <PaginationContent className="max-w-full flex-wrap justify-center gap-1 sm:gap-2">
                                 <PaginationItem>
                                     <PaginationPrevious
                                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}

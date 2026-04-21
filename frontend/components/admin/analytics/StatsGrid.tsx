@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package, DollarSign, ShoppingCart, Clock } from "lucide-react"
+import { Package, DollarSign, ShoppingCart } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -9,7 +9,6 @@ interface StatsGridProps {
     totalOrders: number
     totalRevenue: number
     averageOrderValue: number
-    pendingOrders: number
     isLoading?: boolean
 }
 
@@ -17,7 +16,6 @@ export function StatsGrid({
     totalOrders,
     totalRevenue,
     averageOrderValue,
-    pendingOrders,
     isLoading = false,
 }: StatsGridProps) {
     const t = useTranslations("AdminAnalytics")
@@ -44,19 +42,12 @@ export function StatsGrid({
             color: "text-muted-foreground",
             bgColor: "bg-accent/10",
         },
-        {
-            title: t("pendingOrders"),
-            value: pendingOrders.toLocaleString(),
-            icon: Clock,
-            color: "text-accent-foreground",
-            bgColor: "bg-accent/20",
-        },
     ]
 
     if (isLoading) {
         return (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {[...Array(4)].map((_, i) => (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {[...Array(3)].map((_, i) => (
                     <Card key={i}>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <Skeleton className="h-4 w-24" />
@@ -72,7 +63,7 @@ export function StatsGrid({
     }
 
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {stats.map((stat) => {
                 const Icon = stat.icon
                 return (

@@ -35,6 +35,7 @@ describe("OrderService", () => {
       jest.spyOn(Cart, "findOrCreate").mockResolvedValue([{ id: 1 } as any, false]);
       jest.spyOn(CartItem, "findAll").mockResolvedValue([
         {
+          itemType: "product",
           productId: 10,
           quantity: 2,
           Product: { price: 50 },

@@ -18,10 +18,10 @@ export interface Order {
     status: string
     paymentStatus: string
     currency: string
-    subtotal: string
-    shipping: string
-    tax: string
-    total: string
+    subtotal: number
+    shipping: number
+    tax: number
+    total: number
     metadata: {
         discountCode?: string
         discountAmount?: number
@@ -35,7 +35,9 @@ export interface Order {
         id: number
         email: string
         role: string
-    }
+    } | null
+    userName?: string
+    userEmail?: string
     items: OrderItem[]
     location?: {
         id: number
@@ -94,7 +96,7 @@ export interface AnalyticsFilters {
 export interface OrderUpdatePayload {
     status?: string
     paymentStatus?: string
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
 }
 
 // Admin orders filters
@@ -106,6 +108,25 @@ export interface AdminOrdersFilters {
     startDate?: string
     endDate?: string
 }
+
+const parseCurrencyValue = (value: string | number | null | undefined): number => {
+    const numericValue = typeof value === "number" ? value : Number(value ?? 0)
+    return Number.isFinite(numericValue) ? numericValue : 0
+}
+
+const normalizeOrder = (order: Order): Order => ({
+    ...order,
+    subtotal: parseCurrencyValue(order.subtotal),
+    shipping: parseCurrencyValue(order.shipping),
+    tax: parseCurrencyValue(order.tax),
+    total: parseCurrencyValue(order.total),
+    userEmail: order.user?.email,
+})
+
+const normalizeOrdersResponse = (response: OrdersResponse): OrdersResponse => ({
+    ...response,
+    data: response.data.map(normalizeOrder),
+})
 
 export function useOrders() {
     const [isLoading, setIsLoading] = useState(false)
@@ -129,8 +150,8 @@ export function useOrders() {
             )
 
             if (response.ok) {
-                const data = await response.json()
-                return data
+                const data: OrdersResponse = await response.json()
+                return normalizeOrdersResponse(data)
             }
             return null
         } catch (error) {
@@ -159,8 +180,8 @@ export function useOrders() {
             )
 
             if (response.ok) {
-                const data = await response.json()
-                return data
+                const data: Order = await response.json()
+                return normalizeOrder(data)
             }
             return null
         } catch (error) {
@@ -205,8 +226,8 @@ export function useOrders() {
             )
 
             if (response.ok) {
-                const data = await response.json()
-                return data
+                const data: OrdersResponse = await response.json()
+                return normalizeOrdersResponse(data)
             }
             return null
         } catch (error) {
@@ -235,8 +256,8 @@ export function useOrders() {
             )
 
             if (response.ok) {
-                const data = await response.json()
-                return data
+                const data: Order = await response.json()
+                return normalizeOrder(data)
             }
             return null
         } catch (error) {
@@ -268,8 +289,8 @@ export function useOrders() {
             )
 
             if (response.ok) {
-                const data = await response.json()
-                return data
+                const data: Order = await response.json()
+                return normalizeOrder(data)
             }
             return null
         } catch (error) {

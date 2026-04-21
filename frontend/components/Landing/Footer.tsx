@@ -1,10 +1,9 @@
 "use client"
 
-import * as React from "react"
 import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
-import { MapPin, Phone, FileText, Mail } from "lucide-react"
+import { MapPin, Phone, FileText } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 export function Footer() {
@@ -20,7 +19,7 @@ export function Footer() {
                         <div className="flex flex-col sm:flex-row items-center gap-3">
                             <div className="relative h-14 w-14 sm:h-20 sm:w-20 md:h-24 md:w-24 overflow-hidden rounded-lg shrink-0">
                                 <Image
-                                    src="/Logo.png"
+                                    src="/new-logo.png"
                                     alt="Interioro Logo"
                                     fill
                                     className="object-cover"
@@ -101,6 +100,12 @@ export function Footer() {
                                 className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors"
                             >
                                 {t('categories')}
+                            </Link>
+                            <Link
+                                href="/design-services"
+                                className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors"
+                            >
+                                {t('designServices')}
                             </Link>
                             {isAuthenticated && (
                                 <Link

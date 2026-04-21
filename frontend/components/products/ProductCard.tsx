@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useCart } from "@/context/CartContext"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Link } from "@/i18n/navigation"
@@ -37,7 +37,7 @@ export interface Product {
     // Admin-specific fields
     imageUrl?: string
     stock?: number
-    specs?: string | Record<string, any>
+    specs?: string | Record<string, unknown>
 }
 
 interface ProductCardProps {
@@ -127,14 +127,17 @@ export function ProductCard({
     const cardContent = (
         <>
             {showImage && (
-                <div className="bg-muted flex items-center justify-center relative overflow-hidden aspect-4/5 w-full">
+                <div className={cn(
+                    "relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden",
+                    product.imageUrl ? "bg-card" : "bg-muted"
+                )}>
                     {product.imageUrl ? (
                         <Image
                             src={product.imageUrl}
                             alt={product.name}
                             fill
                             unoptimized
-                            className="object-fit p-2 transition-transform duration-300 group-hover:scale-105"
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
                     ) : (
@@ -157,12 +160,12 @@ export function ProductCard({
                 </div>
             )}
 
-            <div className="flex flex-1 flex-col p-2.5 sm:p-3 md:p-4 h-full">
+            <div className="flex h-full min-w-0 flex-1 flex-col p-3 sm:p-4">
                 {/* Upper content area - grows to fill available space */}
                 <div className="flex-1">
                     <CardHeader className="p-0 space-y-1">
-                        <div className="flex items-start justify-between gap-2">
-                            <CardTitle className="font-semibold line-clamp-2 h-[2.4em] md:h-[3em] text-xs sm:text-sm md:text-base leading-tight md:leading-snug">
+                        <div className="flex min-w-0 items-start justify-between gap-2">
+                            <CardTitle className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-tight sm:text-base">
                                 {product.name}
                             </CardTitle>
                         </div>
@@ -175,7 +178,7 @@ export function ProductCard({
                     </CardHeader>
 
                     {/* Product metadata - reserve space even when empty for consistent height */}
-                    <div className="text-[11px] sm:text-xs text-muted-foreground flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 mt-2 h-6 overflow-hidden">
+                    <div className="mt-2 flex min-h-6 flex-wrap gap-x-2 gap-y-1 overflow-hidden text-[11px] text-muted-foreground sm:gap-x-3 sm:text-xs">
                         {showMetadata && (
                             <>
                                 {product.manufacturer && (
@@ -194,10 +197,10 @@ export function ProductCard({
                 </div>
 
                 {/* Bottom section - price, stock, and button - always at bottom */}
-                <div className="mt-auto pt-3 flex flex-col gap-2">
+                <div className="mt-auto flex flex-col gap-2 pt-3">
                     <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <div className="font-bold text-base sm:text-lg text-primary">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <div className="text-base font-bold text-primary sm:text-lg">
                                 {tCommon('currency')} {parseFloat(product.price).toFixed(2)}
                             </div>
 
@@ -228,19 +231,19 @@ export function ProductCard({
                         </div>
                     </div>
 
-                    <CardFooter className="p-0 gap-2 min-w-0">
+                    <CardFooter className="min-w-0 gap-2 p-0">
                         {isAdmin ? (
                             <div className="flex gap-2 w-full mx-1">
                                 <Button
                                     variant="default"
                                     size="sm"
-                                    className="flex-1"
+                                    className="min-w-0 flex-1"
                                     asChild
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <Link href={`/admin/products/${product.id}`}>
-                                        <Eye className="h-4 w-4 me-2" />
-                                        {tAdmin('viewDetails')}
+                                        <Eye className="h-4 w-4 shrink-0 me-2" />
+                                        <span className="truncate">{tAdmin('viewDetails')}</span>
                                     </Link>
                                 </Button>
                                 <Button
@@ -263,7 +266,7 @@ export function ProductCard({
                             </div>
                         ) : (
                             <Button
-                                className="w-full text-xs sm:text-sm"
+                                className="w-full min-w-0 text-xs sm:text-sm"
                                 size="sm"
                                 disabled={!product.isPurchasable || isAdding}
                                 variant={product.isPurchasable ? "default" : "secondary"}
@@ -273,8 +276,8 @@ export function ProductCard({
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
                                     <>
-                                        <ShoppingCart className="h-4 w-4 me-2" />
-                                        {product.isPurchasable ? t('addToCart') : t('unavailable')}
+                                        <ShoppingCart className="h-4 w-4 shrink-0 me-2" />
+                                        <span className="truncate">{product.isPurchasable ? t('addToCart') : t('unavailable')}</span>
                                     </>
                                 )}
                             </Button>

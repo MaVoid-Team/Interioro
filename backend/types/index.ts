@@ -14,6 +14,11 @@ import Location from "./Location";
 import DiscountCode from "./DiscountCode";
 import ProductBundle from "./ProductBundle";
 import BundleProduct from "./BundleProduct";
+import PortfolioProject from "./PortfolioProject";
+import PortfolioProjectImage from "./PortfolioProjectImage";
+import CustomDesignRequest from "./CustomDesignRequest";
+import SpecialPieceRequest from "./SpecialPieceRequest";
+import ConsultationRequest from "./ConsultationRequest";
 
 let associationsInitialized = false;
 
@@ -108,6 +113,39 @@ export const initAssociations = () => {
     as: "Bundles",
   });
 
+  // Portfolio relationships
+  PortfolioProject.hasMany(PortfolioProjectImage, {
+    foreignKey: "projectId",
+    as: "galleryImages",
+    onDelete: "CASCADE",
+  });
+  PortfolioProjectImage.belongsTo(PortfolioProject, {
+    foreignKey: "projectId",
+    as: "project",
+  });
+
+  // Design service request relationships
+  User.hasMany(CustomDesignRequest, {
+    foreignKey: "userId",
+    as: "customDesignRequests",
+    onDelete: "SET NULL",
+  });
+  CustomDesignRequest.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+  User.hasMany(SpecialPieceRequest, {
+    foreignKey: "userId",
+    as: "specialPieceRequests",
+    onDelete: "SET NULL",
+  });
+  SpecialPieceRequest.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+  User.hasMany(ConsultationRequest, {
+    foreignKey: "userId",
+    as: "consultationRequests",
+    onDelete: "SET NULL",
+  });
+  ConsultationRequest.belongsTo(User, { foreignKey: "userId", as: "user" });
+
   associationsInitialized = true;
 };
 
@@ -131,4 +169,9 @@ export {
   DiscountCode,
   ProductBundle,
   BundleProduct,
+  PortfolioProject,
+  PortfolioProjectImage,
+  CustomDesignRequest,
+  SpecialPieceRequest,
+  ConsultationRequest,
 };

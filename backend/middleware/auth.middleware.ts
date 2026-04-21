@@ -5,6 +5,23 @@ import ac from "../config/roles";
 // 1. Authentication Middleware (Checks if Token is valid)
 export const authenticate = passport.authenticate("jwt", { session: false });
 
+export const attachUserIfAuthenticated = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  passport.authenticate(
+    "jwt",
+    { session: false },
+    (err: unknown, user: unknown) => {
+      if (!err && user) {
+        req.user = user as Express.User;
+      }
+      next();
+    }
+  )(req, res, next);
+};
+
 // 2. Authorization Middleware (Checks if User has permission)
 export const authorize = (action: string, resource: string) => {
   return (req: Request, res: Response, next: NextFunction) => {

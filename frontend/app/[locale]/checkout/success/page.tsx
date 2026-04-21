@@ -1,14 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useRouter } from "@/i18n/navigation"
 import { useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { CheckCircle, XCircle, Loader2, AlertCircle } from "lucide-react"
+import { CheckCircle, XCircle, AlertCircle } from "lucide-react"
 
-type PaymentStatus = "loading" | "success" | "failed" | "pending"
+type PaymentStatus = "success" | "failed" | "pending"
 
 export default function CheckoutSuccessPage() {
     const router = useRouter()
@@ -19,44 +17,19 @@ export default function CheckoutSuccessPage() {
     const statusParam = searchParams.get('status')
     const successParam = searchParams.get('success')
     const pendingParam = searchParams.get('pending')
-
-    const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("loading")
-
-    useEffect(() => {
-        // Determine payment status from URL params
-        // Paymob redirects with success=true/false or pending=true
-        if (statusParam === "success" || successParam === "true") {
-            setPaymentStatus("success")
-        } else if (successParam === "false") {
-            setPaymentStatus("failed")
-        } else if (pendingParam === "true") {
-            setPaymentStatus("pending")
-        } else if (orderId) {
-            // If we have an orderId but no status, assume success (cash payment)
-            setPaymentStatus("success")
-        } else {
-            // No orderId and no clear status - likely a failed payment
-            setPaymentStatus("failed")
-        }
-    }, [statusParam, successParam, pendingParam, orderId])
+    const paymentStatus: PaymentStatus =
+        statusParam === "success" || successParam === "true"
+            ? "success"
+            : successParam === "false"
+              ? "failed"
+              : pendingParam === "true"
+                ? "pending"
+                : orderId
+                  ? "success"
+                  : "failed"
 
     const renderContent = () => {
         switch (paymentStatus) {
-            case "loading":
-                return (
-                    <>
-                        <div className="rounded-full bg-muted p-6">
-                            <Loader2 className="h-16 w-16 text-muted-foreground animate-spin" />
-                        </div>
-                        <div className="text-center space-y-2">
-                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{t('processing')}</h1>
-                            <p className="text-muted-foreground max-w-md">
-                                {t('processingDescription')}
-                            </p>
-                        </div>
-                    </>
-                )
-
             case "success":
                 return (
                     <>

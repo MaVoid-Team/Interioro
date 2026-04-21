@@ -34,7 +34,7 @@ export function FeaturedProducts() {
 
     if (isLoading) {
         return (
-            <section className="bg-surface-container-low px-6 py-24">
+            <section className="bg-surface-container-low px-4 py-12 sm:px-6 sm:py-20">
                 <div className="container max-w-screen-xl">
                     <h2 className="text-3xl md:text-5xl font-serif font-bold text-center mb-16 text-foreground">
                         {t('title')}
@@ -49,18 +49,18 @@ export function FeaturedProducts() {
     }
 
     return (
-        <section className="bg-surface-container-low py-24 relative overflow-hidden">
+        <section className="relative overflow-hidden bg-surface-container-low py-14 sm:py-20 lg:py-24">
             {/* Decorative background element */}
             <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-secondary/20 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-            <div className="container max-w-screen-xl px-6 relative z-10">
+            <div className="container relative z-10 max-w-screen-xl px-4 sm:px-6">
                 {/* Header */}
-                <div className={`flex flex-col ${isRtl ? 'items-end text-end' : 'items-start text-start'} mb-16`}>
+                <div className={`mb-8 flex flex-col sm:mb-12 lg:mb-16 ${isRtl ? 'items-end text-end' : 'items-start text-start'}`}>
                     <motion.h2 
                         initial={{ opacity: 0, x: isRtl ? -20 : 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="text-4xl md:text-6xl font-serif font-bold tracking-tighter text-foreground mb-4"
+                        className="mb-3 text-3xl font-serif font-bold leading-tight text-foreground sm:text-4xl md:text-6xl"
                     >
                         {t('title')}
                     </motion.h2>
@@ -69,14 +69,14 @@ export function FeaturedProducts() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="text-lg text-muted-foreground max-w-2xl leading-relaxed font-sans"
+                        className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
                     >
                         Our most coveted pieces, curated for the discerning eye.
                     </motion.p>
                 </div>
 
                 {/* Bento 2.0 Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-12 md:gap-6">
                     {products.slice(0, 6).map((product, i) => {
                         // Logic for Bento Layout
                         // 0: Large (4x4)
@@ -87,7 +87,7 @@ export function FeaturedProducts() {
                         // 5: Large (4x4)
                         
                         const isLarge = i === 0 || i === 5;
-                        const gridSpan = isLarge ? "md:col-span-4 md:row-span-2" : "md:col-span-4";
+                        const gridSpan = isLarge ? "sm:col-span-2 md:col-span-4 md:row-span-2" : "md:col-span-4";
 
                         return (
                             <motion.div 
@@ -114,8 +114,8 @@ export function FeaturedProducts() {
                     })}
                 </div>
 
-                <div className={`flex ${isRtl ? 'justify-end' : 'justify-start'} mt-16`}>
-                    <Button variant="outline" size="lg" className="rounded-full px-8 group">
+                <div className={`mt-10 flex ${isRtl ? 'justify-end' : 'justify-start'} sm:mt-16`}>
+                    <Button variant="outline" size="lg" className="group w-full rounded-full px-6 sm:w-auto sm:px-8">
                         View Full Collection
                         <ArrowRight className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>

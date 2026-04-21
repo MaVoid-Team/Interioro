@@ -79,11 +79,11 @@ export function CheckoutSummary({
     }
 
     return (
-        <Card className="sticky top-4 bg-card">
-            <CardHeader>
+        <Card className="bg-card lg:sticky lg:top-4">
+            <CardHeader className="p-4 sm:p-6">
                 <CardTitle>{t('summary.title')}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
                 {/* Items */}
                 <div className="space-y-3">
                     {cartData.items.map((item) => {
@@ -92,8 +92,8 @@ export function CheckoutSummary({
                         if (!displayItem) return null
 
                         return (
-                            <div key={item.id} className="flex gap-4 text-sm">
-                                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border bg-background">
+                            <div key={item.id} className="flex min-w-0 gap-3 text-sm sm:gap-4">
+                                <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-md border bg-background sm:h-16 sm:w-16">
                                     {displayItem.imageUrl ? (
                                         <Image
                                             src={displayItem.imageUrl}
@@ -109,7 +109,7 @@ export function CheckoutSummary({
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex flex-1 flex-col justify-center">
+                                <div className="flex min-w-0 flex-1 flex-col justify-center">
                                     <span className="font-medium line-clamp-2">
                                         {displayItem.name}
                                     </span>
@@ -117,7 +117,7 @@ export function CheckoutSummary({
                                         Qty: {item.quantity}
                                     </span>
                                 </div>
-                                <span className="font-medium flex items-center">
+                                <span className="flex shrink-0 items-center text-xs font-medium sm:text-sm">
                                     {tCommon('currency')} {(parseFloat(displayItem.price) * item.quantity).toFixed(2)}
                                 </span>
                             </div>
@@ -157,7 +157,7 @@ export function CheckoutSummary({
                                 </Button>
                             </div>
                         ) : (
-                            <div className="flex gap-2">
+                            <div className="flex flex-col gap-2 sm:flex-row">
                                 <Input
                                     placeholder={t('summary.promoCodePlaceholder')}
                                     value={promoCode}
@@ -189,13 +189,13 @@ export function CheckoutSummary({
                 <Separator />
 
                 {/* Subtotal */}
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between gap-3 text-sm">
                     <span>{t('summary.subtotal')}</span>
                     <span>{tCommon('currency')} {subtotal.toFixed(2)}</span>
                 </div>
 
                 {/* Shipping */}
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between gap-3 text-sm">
                     <span className="flex items-center gap-1">
                         {t('summary.shipping')}
                         {selectedLocation && (
@@ -210,7 +210,7 @@ export function CheckoutSummary({
                 </div>
 
                 {/* Tax */}
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between gap-3 text-sm">
                     <span className="flex items-center gap-1">
                         {t('summary.tax')}
                         {selectedLocation && (
@@ -224,7 +224,7 @@ export function CheckoutSummary({
 
                 {/* Discount */}
                 {discountAmount > 0 && (
-                    <div className="flex justify-between text-sm text-primary">
+                    <div className="flex justify-between gap-3 text-sm text-primary">
                         <span className="flex items-center gap-1">
                             <Tag className="h-3 w-3" />
                             {t('summary.discount')}
@@ -236,7 +236,7 @@ export function CheckoutSummary({
                 <Separator />
 
                 {/* Total */}
-                <div className="flex justify-between text-lg font-bold">
+                <div className="flex justify-between gap-3 text-base font-bold sm:text-lg">
                     <span>{t('summary.total')}</span>
                     <span>{tCommon('currency')} {total.toFixed(2)}</span>
                 </div>

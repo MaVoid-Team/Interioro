@@ -7,11 +7,10 @@ import { List } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { SearchBar } from "@/components/Landing/SearchBar"
 import { Cart } from "@/components/Landing/Cart"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useAuth } from "@/context/AuthContext"
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher"
-import { ThemeSwitcher } from "@/components/ui/theme-switcher"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import {
     Sheet,
     SheetContent,
@@ -23,23 +22,25 @@ import {
 
 export function Navbar() {
     const t = useTranslations('Navbar')
+    const locale = useLocale()
     const { isAuthenticated, logout, user } = useAuth()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+    const mobileMenuSide = locale === "ar" ? "left" : "right"
 
     return (
-        <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+        <div className="fixed top-2 inset-x-0 z-50 flex justify-center px-2 pointer-events-none sm:top-4 sm:px-4">
             <motion.header 
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                className="glass pointer-events-auto flex items-center justify-between h-16 px-4 md:px-8 rounded-full w-full max-w-screen-xl shadow-lg"
+                className="glass pointer-events-auto flex h-14 w-full max-w-screen-xl items-center justify-between gap-1 rounded-full px-2 shadow-lg sm:h-16 sm:px-4 md:px-6 lg:px-8"
             >
                 {/* Left: Logo */}
                 <div className="flex items-center shrink-0">
-                    <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                        <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-primary/10">
+                    <Link href="/" className="flex min-w-0 items-center gap-2 transition-opacity hover:opacity-90 sm:gap-3">
+                        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-primary/10 sm:h-10 sm:w-10">
                             <Image
-                                src="/Logo.png"
+                                src="/new-logo.png"
                                 alt="Interioro Logo"
                                 fill
                                 className="object-cover"
@@ -53,17 +54,18 @@ export function Navbar() {
                 </div>
 
                 {/* Middle: Nav Items */}
-                <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-on-surface/70">
+                <nav className="hidden min-w-0 items-center gap-4 text-sm font-medium text-on-surface/70 md:flex lg:gap-7">
                     {[
                         { name: t('home'), href: "/" },
                         { name: t('products'), href: "/products" },
                         { name: t('bundles'), href: "/bundles" },
                         { name: t('categories'), href: "/categories" },
+                        { name: t('designServices'), href: "/design-services" },
                     ].map((item) => (
                         <Link 
                             key={item.href}
                             href={item.href} 
-                            className="hover:text-primary transition-colors duration-200 relative group"
+                            className="hover:text-primary transition-colors duration-200 relative group whitespace-nowrap"
                         >
                             {item.name}
                             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -84,16 +86,15 @@ export function Navbar() {
                 </nav>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="md:hidden">
+                <div className="flex min-w-0 items-center gap-0.5 sm:gap-2 md:gap-3">
+                    <div className="hidden sm:block md:hidden">
                         <SearchBar />
                     </div>
 
                     <Cart />
                     <LanguageSwitcher />
-                    <ThemeSwitcher />
 
-                    <div className="hidden items-center gap-3 md:flex ms-4">
+                    <div className="hidden items-center gap-2 md:flex lg:gap-3">
                         {isAuthenticated ? (
                             <>
                                 <Link href="/profile">
@@ -131,22 +132,28 @@ export function Navbar() {
                                 <List className="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[85vw] max-w-[320px] sm:w-[350px] bg-surface">
-                            <SheetHeader>
-                                <SheetTitle className="font-serif text-primary">{t('companyName')}</SheetTitle>
+                        <SheetContent side={mobileMenuSide} className="bg-background p-0">
+                            <SheetHeader className="border-b px-5 py-5 text-start">
+                                <SheetTitle className="pe-8 font-serif text-xl text-primary">{t('companyName')}</SheetTitle>
                             </SheetHeader>
-                            <div className="flex flex-col gap-6 mt-8">
-                                <nav className="flex flex-col gap-2">
+                            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-5">
+                                <div className="flex items-center justify-between gap-2 rounded-2xl bg-muted/60 p-2">
+                                    <SearchBar />
+                                    <Cart />
+                                    <LanguageSwitcher />
+                                </div>
+                                <nav className="flex flex-col gap-1">
                                     {[
                                         { name: t('home'), href: "/" },
                                         { name: t('products'), href: "/products" },
                                         { name: t('bundles'), href: "/bundles" },
                                         { name: t('categories'), href: "/categories" },
+                                        { name: t('designServices'), href: "/design-services" },
                                     ].map((item) => (
                                         <SheetClose key={item.href} asChild>
                                             <Link
                                                 href={item.href}
-                                                className="flex items-center px-4 py-3 text-base font-medium rounded-xl hover:bg-secondary transition-colors"
+                                                className="flex min-h-11 items-center rounded-xl px-4 py-3 text-base font-medium transition-colors hover:bg-secondary"
                                             >
                                                 {item.name}
                                             </Link>
@@ -154,14 +161,14 @@ export function Navbar() {
                                     ))}
                                     {isAuthenticated && (
                                         <SheetClose asChild>
-                                            <Link href="/orders" className="flex items-center px-4 py-3 text-base font-medium rounded-xl hover:bg-secondary transition-colors">
+                                            <Link href="/orders" className="flex min-h-11 items-center rounded-xl px-4 py-3 text-base font-medium transition-colors hover:bg-secondary">
                                                 {t('orders')}
                                             </Link>
                                         </SheetClose>
                                     )}
                                     {isAuthenticated && user?.role === 'admin' && (
                                         <SheetClose asChild>
-                                            <Link href="/admin" className="flex items-center px-4 py-3 text-base font-medium rounded-xl hover:bg-secondary transition-colors">
+                                            <Link href="/admin" className="flex min-h-11 items-center rounded-xl px-4 py-3 text-base font-medium transition-colors hover:bg-secondary">
                                                 {t('adminDashboard')}
                                             </Link>
                                         </SheetClose>

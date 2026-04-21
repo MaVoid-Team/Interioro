@@ -35,7 +35,7 @@ export function FeaturedBundles() {
 
     if (isLoading) {
         return (
-            <section className="bg-surface py-24 px-6">
+            <section className="bg-surface px-4 py-12 sm:px-6 sm:py-20">
                 <div className="container max-w-screen-xl">
                     <div className="h-12 w-64 bg-muted animate-pulse rounded-full mb-12 mx-auto" />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -51,25 +51,25 @@ export function FeaturedBundles() {
     if (bundles.length === 0) return null
 
     return (
-        <section className="bg-surface-container-highest py-24 overflow-hidden">
-            <div className="container max-w-screen-xl px-6">
-                <div className={`flex flex-col ${isRtl ? 'items-end text-end' : 'items-start text-start'} mb-16`}>
+        <section className="overflow-hidden bg-surface-container-highest py-14 sm:py-20 lg:py-24">
+            <div className="container max-w-screen-xl px-4 sm:px-6">
+                <div className={`mb-8 flex flex-col sm:mb-12 lg:mb-16 ${isRtl ? 'items-end text-end' : 'items-start text-start'}`}>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-4xl md:text-6xl font-serif font-bold tracking-tighter text-foreground mb-4"
+                        className="mb-3 text-3xl font-serif font-bold leading-tight text-foreground sm:text-4xl md:text-6xl"
                     >
                         {t('featured')}
                     </motion.h2>
-                    <div className="flex gap-4 mt-4">
+                    <div className="mt-3 flex max-w-full gap-4">
                         <CuratorNote title="The Curator's Choice">
                             These bundles were assembled to create a cohesive atmosphere, blending textures and tones that evoke a sense of organic serenity.
                         </CuratorNote>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="grid grid-cols-1 items-center gap-5 sm:gap-6 lg:grid-cols-12 lg:gap-8">
                     {/* Main Bundle - Large */}
                     <motion.div 
                         initial={{ opacity: 0, x: isRtl ? 50 : -50 }}
@@ -79,14 +79,12 @@ export function FeaturedBundles() {
                     >
                         <BundleCard
                             bundle={bundles[0]}
-                            className="shadow-2xl rounded-[3rem] scale-105"
+                            className="rounded-2xl shadow-2xl sm:rounded-[2rem] lg:rounded-[3rem] lg:scale-105"
                         />
-                        {/* Overlapping decorative element */}
-                        <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/10 rounded-full blur-2xl -z-10" />
                     </motion.div>
 
                     {/* Secondary Bundles - Stacked */}
-                    <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:col-span-5">
                         {bundles.slice(1, 3).map((bundle, i) => (
                             <motion.div 
                                 key={bundle.id}
@@ -98,15 +96,15 @@ export function FeaturedBundles() {
                             >
                                 <BundleCard
                                     bundle={bundle}
-                                    className="rounded-[2rem]"
+                                    className="rounded-2xl sm:rounded-[2rem]"
                                 />
                             </motion.div>
                         ))}
                     </div>
                 </div>
 
-                <div className={`flex ${isRtl ? 'justify-end' : 'justify-start'} mt-16`}>
-                    <Button variant="outline" size="lg" className="rounded-full px-8 group">
+                <div className={`mt-10 flex ${isRtl ? 'justify-end' : 'justify-start'} sm:mt-16`}>
+                    <Button variant="outline" size="lg" className="group w-full rounded-full px-6 sm:w-auto sm:px-8">
                         Explore all Curations
                         <ArrowRight className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>

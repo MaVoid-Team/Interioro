@@ -58,13 +58,13 @@ export function Cart() {
                     )}
                 </Button>
             </SheetTrigger>
-            <SheetContent className="flex w-full flex-col pe-0 sm:max-w-lg">
-                <SheetHeader className="px-1">
+            <SheetContent className="flex w-[min(94vw,32rem)] flex-col p-0">
+                <SheetHeader className="border-b px-5 py-5">
                     <SheetTitle>{t('title')} ({itemCount})</SheetTitle>
                 </SheetHeader>
 
                 {!isAuthenticated ? (
-                    <div className="flex h-full flex-col items-center justify-center space-y-4 pe-6">
+                    <div className="flex h-full flex-col items-center justify-center space-y-4 px-6 text-center">
                         <ShoppingCart className="h-12 w-12 text-muted-foreground/50" />
                         <span className="text-lg font-medium text-muted-foreground text-center">
                             {t('loginRequired')}
@@ -78,8 +78,8 @@ export function Cart() {
                     </div>
                 ) : items.length > 0 ? (
                     <>
-                        <div className="flex-1 overflow-y-auto pe-6">
-                            <ul className="grid gap-6 py-4">
+                        <div className="min-h-0 flex-1 overflow-y-auto px-4 sm:px-6">
+                            <ul className="grid gap-4 py-4 sm:gap-6">
                                 {items.map((item) => {
                                     // Determine item type and data
                                     const isBundle = item.itemType === 'bundle'
@@ -90,8 +90,8 @@ export function Cart() {
                                     if (!itemData || !itemId) return null
 
                                     return (
-                                        <li key={item.id} className="flex items-center gap-4">
-                                            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border bg-background">
+                                        <li key={item.id} className="flex min-w-0 items-center gap-3 sm:gap-4">
+                                            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-background sm:h-20 sm:w-20">
                                                 {itemData.imageUrl ? (
                                                     <Image
                                                         src={itemData.imageUrl}
@@ -107,8 +107,8 @@ export function Cart() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="flex flex-1 flex-col gap-1">
-                                                <div className="flex items-center gap-2">
+                                            <div className="flex min-w-0 flex-1 flex-col gap-1">
+                                                <div className="flex min-w-0 flex-wrap items-center gap-2">
                                                     <span className="font-medium line-clamp-1">{itemData.name}</span>
                                                     {isBundle && (
                                                         <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
@@ -156,7 +156,7 @@ export function Cart() {
                                 })}
                             </ul>
                         </div>
-                        <SheetFooter className="border-t pt-6 pe-6">
+                        <SheetFooter className="border-t px-4 py-5 sm:px-6">
                             <div className="w-full space-y-4">
                                 <div className="flex items-center justify-between text-base font-medium">
                                     <span>{t('total')}</span>
@@ -193,7 +193,7 @@ export function Cart() {
                         </SheetFooter>
                     </>
                 ) : (
-                    <div className="flex h-full flex-col items-center justify-center space-y-2 pe-6">
+                    <div className="flex h-full flex-col items-center justify-center space-y-2 px-6 text-center">
                         <ShoppingCart className="h-12 w-12 text-muted-foreground/50" />
                         <span className="text-lg font-medium text-muted-foreground">
                             {t('emptyTitle')}

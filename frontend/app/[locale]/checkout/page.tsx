@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "@/i18n/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from "@/context/AuthContext"
@@ -8,7 +8,7 @@ import { useUser, Address } from "@/hooks/useUser"
 import { useLocations } from "@/hooks/useLocations"
 import { useCart } from "@/context/CartContext"
 import { useDiscounts, ValidateDiscountResponse } from "@/hooks/useDiscounts"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Location } from "@/types/location"
 import { CheckoutSummary } from "@/components/checkout/CheckoutSummary"
@@ -20,7 +20,6 @@ import { CheckoutSteps } from "@/components/checkout/CheckoutSteps"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
 
 export interface ShippingData {
     firstName: string
@@ -52,11 +51,14 @@ export default function CheckoutPage() {
         getLocationById
     } = useLocations()
     const { cartData, fetchCart, validateCart } = useCart()
+    const locale = useLocale()
     const t = useTranslations('Checkout')
 
     const [currentStep, setCurrentStep] = useState(1)
     const [isLoading, setIsLoading] = useState(true)
     const [isCheckingOut, setIsCheckingOut] = useState(false)
+    const [isValidating, setIsValidating] = useState(false)
+    const [validationError, setValidationError] = useState<string | null>(null)
 
     // Promo code state
     const { validateDiscount } = useDiscounts()
@@ -105,6 +107,9 @@ export default function CheckoutPage() {
             const validation = await validateCart()
             if (validation && !validation.valid) {
                 setValidationError(validation.message)
+                toast.error(validation.message)
+            } else {
+                setValidationError(null)
             }
             setIsValidating(false)
             setIsLoading(false)
@@ -123,18 +128,8 @@ export default function CheckoutPage() {
         }
     }, [isAuthenticated, fetchAddresses, fetchLocations])
 
-    // Pre-select default address
-    useEffect(() => {
-        if (addresses.length > 0 && !selectedAddress) {
-            const defaultAddr = addresses.find(addr => addr.isDefault)
-            if (defaultAddr) {
-                handleSelectAddress(defaultAddr)
-            }
-        }
-    }, [addresses])
-
     // Handle address selection
-    const handleSelectAddress = (address: Address) => {
+    const handleSelectAddress = useCallback((address: Address) => {
         setSelectedAddress(address)
 
         // Parse recipient name into first/last name
@@ -153,7 +148,17 @@ export default function CheckoutPage() {
             zipCode: address.postalCode || '',
             country: 'Saudi Arabia',
         })
-    }
+    }, [userEmail])
+
+    // Pre-select default address
+    useEffect(() => {
+        if (addresses.length > 0 && !selectedAddress) {
+            const defaultAddr = addresses.find(addr => addr.isDefault)
+            if (defaultAddr) {
+                handleSelectAddress(defaultAddr)
+            }
+        }
+    }, [addresses, selectedAddress, handleSelectAddress])
 
     // Handle location selection
     const handleSelectLocation = (location: Location | null) => {
@@ -195,6 +200,10 @@ export default function CheckoutPage() {
             toast.error(t('locationSelector.pleaseSelect'))
             return
         }
+        if (validationError) {
+            toast.error(validationError)
+            return
+        }
         setCurrentStep(2)
     }
 
@@ -233,6 +242,10 @@ export default function CheckoutPage() {
         // Ensure locationId is selected (mandatory for backend)
         if (!selectedLocationId) {
             toast.error(t('locationSelector.pleaseSelect'))
+            return
+        }
+        if (validationError) {
+            toast.error(validationError)
             return
         }
 
@@ -293,6 +306,7 @@ export default function CheckoutPage() {
                         paymentType: 'card',
                         locationId: selectedLocationId,
                         discountCode: appliedDiscount?.discountCode?.code,
+                        locale,
                         // Include calculated amounts for Paymob
                         subtotal: subtotal,
                         taxAmount: taxAmount,
@@ -418,20 +432,26 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-surface py-12 px-4 md:px-8 lg:px-16 xl:px-32 max-w-screen-3xl mx-auto">
-            <div className="flex flex-col items-center text-center mb-12">
-                <h1 className="text-4xl md:text-6xl font-serif text-foreground tracking-tight mb-4">
+        <div className="mx-auto min-h-screen max-w-screen-3xl bg-surface px-4 py-8 sm:py-10 md:px-8 lg:px-16 xl:px-32">
+            <div className="mb-8 flex flex-col items-center text-center sm:mb-12">
+                <h1 className="mb-4 text-3xl font-serif leading-tight text-foreground sm:text-4xl md:text-6xl">
                     {t('title')}
                 </h1>
                 <div className="w-24 h-1 bg-primary/30 rounded-full" />
             </div>
 
-            <div className="flex justify-center mb-16">
+            <div className="mb-8 flex justify-center overflow-x-auto pb-2 sm:mb-12 lg:mb-16">
                 <CheckoutSteps currentStep={currentStep} />
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-12 items-start">
+            <div className="grid items-start gap-8 lg:grid-cols-3 lg:gap-12">
                 <div className="lg:col-span-2">
+                    {validationError && (
+                        <div className="mb-6 rounded-3xl border border-destructive/20 bg-destructive/5 px-6 py-4 text-sm text-destructive">
+                            {validationError}
+                        </div>
+                    )}
+
                     <AnimatePresence mode="wait">
                         {currentStep === 1 && (
                             <motion.div 
@@ -440,9 +460,9 @@ export default function CheckoutPage() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
                                 transition={{ duration: 0.4 }}
-                                className="space-y-10"
+                                className="space-y-6 sm:space-y-10"
                             >
-                                <div className="space-y-8">
+                                <div className="space-y-6 sm:space-y-8">
                                     <AddressSelection
                                         addresses={addresses}
                                         selectedAddressId={selectedAddress?.id || null}
@@ -463,10 +483,10 @@ export default function CheckoutPage() {
                                 <Button
                                     onClick={handleContinueToReview}
                                     size="lg"
-                                    className="w-full h-16 rounded-full text-lg transition-all duration-300 hover:scale-[1.01]"
-                                    disabled={!selectedAddress || !selectedLocationId}
+                                    className="h-14 w-full rounded-full text-base transition-all duration-300 hover:scale-[1.01] sm:h-16 sm:text-lg"
+                                    disabled={!selectedAddress || !selectedLocationId || !!validationError || isValidating}
                                 >
-                                    {t('shipping.continue')}
+                                    {isValidating ? t('summary.applying') : t('shipping.continue')}
                                 </Button>
                             </motion.div>
                         )}
@@ -493,7 +513,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="lg:sticky lg:top-24">
-                    <div className="glass backdrop-blur-xl rounded-[3rem] p-2 shadow-2xl">
+                    <div className="rounded-2xl bg-background shadow-lg sm:p-2 lg:rounded-[3rem] lg:shadow-2xl">
                         <CheckoutSummary
                             cartData={cartData}
                             selectedLocation={selectedLocation}

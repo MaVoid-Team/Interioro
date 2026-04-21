@@ -12,6 +12,8 @@ import paymobRoutes from "./paymob.routes";
 import bundleRoutes from "./bundle.routes";
 import discountController from "../controllers/discount.controller";
 import locationController from "../controllers/location.controller";
+import portfolioRoutes from "./portfolio.routes";
+import designRequestRoutes from "./designRequest.routes";
 
 const router = Router();
 
@@ -26,6 +28,8 @@ router.use("/addresses", userAddressRoutes);
 router.use("/admin", adminRoutes);
 router.use("/webhooks/paymob", paymobRoutes);
 router.use("/bundles", bundleRoutes);
+router.use("/portfolio", portfolioRoutes);
+router.use("/design-requests", designRequestRoutes);
 
 // Public discount validation endpoint
 router.post("/discounts/validate", (req, res, next) => discountController.validate(req, res, next));

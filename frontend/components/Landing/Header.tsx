@@ -37,7 +37,7 @@ export function Header() {
     }
 
     return (
-        <section className="relative w-full min-h-[90dvh] flex items-center overflow-hidden bg-surface">
+        <section className="relative flex min-h-[82dvh] w-full items-center overflow-hidden bg-surface pt-20 sm:min-h-[90dvh]">
             {/* Background Image with Editorial Overlay */}
             <div className="absolute inset-0 z-0">
                 <Image
@@ -51,35 +51,35 @@ export function Header() {
             </div>
 
             {/* Asymmetric Content */}
-            <div className="container relative z-10 mx-auto px-6 lg:px-12">
+            <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-12">
                 <motion.div 
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className={`flex flex-col ${isRtl ? 'items-end text-end' : 'items-start text-start'} max-w-4xl`}
+                    className={`flex max-w-4xl flex-col ${isRtl ? 'items-end text-end' : 'items-start text-start'}`}
                 >
-                    <motion.div variants={itemVariants} className="space-y-4">
-                        <h1 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-bold tracking-tighter text-white leading-[1.1]">
+                    <motion.div variants={itemVariants} className="max-w-full space-y-4">
+                        <h1 className="text-4xl font-serif font-bold text-white leading-[1.08] sm:text-6xl lg:text-8xl">
                             <span className="text-secondary drop-shadow-sm">
                                 {t('companyName')}
                             </span>
                         </h1>
-                        <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 max-w-2xl leading-relaxed font-sans">
+                        <p className="max-w-2xl text-base leading-relaxed text-gray-300 sm:text-xl lg:text-2xl">
                             {t('description')}
                         </p>
                     </motion.div>
 
                     <motion.div 
                         variants={itemVariants}
-                        className="flex flex-wrap gap-4 mt-10"
+                        className="mt-8 flex w-full flex-col gap-3 sm:mt-10 sm:w-auto sm:flex-row sm:flex-wrap sm:gap-4"
                     >
                         <Link href={"/products"}>
-                            <Button size="lg" className="text-base px-10">
+                            <Button size="lg" className="w-full px-8 text-base sm:w-auto sm:px-10">
                                 {t('shopNow')}
                             </Button>
                         </Link>
                         <Link href={"/categories"}>
-                            <Button variant="outline" size="lg" className="text-base px-10 border-none bg-white/10 text-white hover:bg-white/20 backdrop-blur-md">
+                            <Button variant="outline" size="lg" className="w-full border-none bg-white/10 px-8 text-base text-white backdrop-blur-md hover:bg-white/20 sm:w-auto sm:px-10">
                                 {t('explore')}
                             </Button>
                         </Link>

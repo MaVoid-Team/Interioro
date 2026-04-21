@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useTranslations } from "next-intl"
-import { useOrders } from "@/hooks/useOrders"
+import { AnalyticsSummary, useOrders } from "@/hooks/useOrders"
 import { StatsGrid } from "@/components/admin/analytics/StatsGrid"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,18 +19,33 @@ export default function AnalyticsPage() {
     const t = useTranslations("AdminAnalytics")
     const { getAnalyticsSummary, isLoading } = useOrders()
     const [period, setPeriod] = useState<"month" | "year">("month")
-    const [analyticsData, setAnalyticsData] = useState<any>(null)
+    const [analyticsData, setAnalyticsData] = useState<AnalyticsSummary | null>(null)
+
+    const fetchAnalytics = useCallback(() => {
+        return getAnalyticsSummary({ period })
+    }, [getAnalyticsSummary, period])
 
     useEffect(() => {
-        fetchAnalytics()
-    }, [period])
+        let isMounted = true
 
-    const fetchAnalytics = async () => {
-        const data = await getAnalyticsSummary({ period })
-        if (data) {
-            setAnalyticsData(data)
+        const loadAnalytics = async () => {
+            const data = await fetchAnalytics()
+            if (isMounted) {
+                setAnalyticsData(data)
+            }
         }
-    }
+
+        void loadAnalytics()
+
+        return () => {
+            isMounted = false
+        }
+    }, [fetchAnalytics])
+
+    const handleRefresh = useCallback(async () => {
+        const data = await fetchAnalytics()
+        setAnalyticsData(data)
+    }, [fetchAnalytics])
 
     return (
         <div className="flex-1 space-y-4 sm:space-y-6">
@@ -44,7 +59,7 @@ export default function AnalyticsPage() {
                 {/* Period Selector */}
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
-                    <Select value={period} onValueChange={(value: any) => setPeriod(value)}>
+                    <Select value={period} onValueChange={(value) => setPeriod(value as "month" | "year")}>
                         <SelectTrigger className="flex-1 sm:w-[140px] md:w-[180px]">
                             <SelectValue placeholder={t("selectPeriod")} />
                         </SelectTrigger>
@@ -53,7 +68,7 @@ export default function AnalyticsPage() {
                             <SelectItem value="year">{t("lastYear")}</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button onClick={fetchAnalytics} variant="outline" size="sm">
+                    <Button onClick={() => void handleRefresh()} variant="outline" size="sm">
                         {t("refresh")}
                     </Button>
                 </div>
@@ -64,7 +79,6 @@ export default function AnalyticsPage() {
                 totalOrders={analyticsData?.totalOrders || 0}
                 totalRevenue={analyticsData?.totalRevenue || 0}
                 averageOrderValue={analyticsData?.averageOrderValue || 0}
-                pendingOrders={analyticsData?.pendingOrders || 0}
                 isLoading={isLoading}
             />
 
@@ -124,7 +138,7 @@ export default function AnalyticsPage() {
                 <Card>
                     <CardContent className="flex flex-col items-center justify-center py-12">
                         <p className="text-muted-foreground">{t("noData")}</p>
-                        <Button onClick={fetchAnalytics} variant="outline" className="mt-4">
+                        <Button onClick={() => void handleRefresh()} variant="outline" className="mt-4">
                             {t("tryAgain")}
                         </Button>
                     </CardContent>

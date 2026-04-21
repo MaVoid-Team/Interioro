@@ -65,11 +65,11 @@ export default function CategoriesPage() {
     }, [selectedCategoryId])
 
     return (
-        <div className="max-w-screen-2xl mx-auto py-8 px-4 md:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:py-8 md:px-8">
             {/* Page Header */}
-            <div className="mb-8">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-                    <Grid3X3 className="h-8 w-8" />
+            <div className="mb-6 sm:mb-8">
+                <h1 className="flex items-center gap-3 text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
+                    <Grid3X3 className="h-6 w-6 shrink-0 sm:h-8 sm:w-8" />
                     {t('title')}
                 </h1>
                 <p className="text-muted-foreground mt-2">{t('description')}</p>
@@ -109,7 +109,7 @@ export default function CategoriesPage() {
                             </CardContent>
                         </Card>
                     ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                             {products.map((product) => (
                                 <ProductCard
                                     key={product.id}

@@ -10,8 +10,15 @@ export async function PUT(
         const { productId } = await params;
         const token = request.headers.get('Authorization');
         const body = await request.json();
+        const requestUrl = new URL(request.url);
+        const type = requestUrl.searchParams.get('type');
+        const targetUrl = new URL(`${API_URL}/api/v1/cart/items/${productId}`);
 
-        const response = await fetch(`${API_URL}/api/v1/cart/items/${productId}`, {
+        if (type) {
+            targetUrl.searchParams.set('type', type);
+        }
+
+        const response = await fetch(targetUrl.toString(), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -39,8 +46,15 @@ export async function DELETE(
     try {
         const { productId } = await params;
         const token = request.headers.get('Authorization');
+        const requestUrl = new URL(request.url);
+        const type = requestUrl.searchParams.get('type');
+        const targetUrl = new URL(`${API_URL}/api/v1/cart/items/${productId}`);
 
-        const response = await fetch(`${API_URL}/api/v1/cart/items/${productId}`, {
+        if (type) {
+            targetUrl.searchParams.set('type', type);
+        }
+
+        const response = await fetch(targetUrl.toString(), {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

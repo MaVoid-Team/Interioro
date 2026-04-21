@@ -19,3 +19,8 @@ const upload = multer({
 });
 
 export const singleImageUpload = (fieldName: string) => upload.single(fieldName);
+export const multipleImageUpload = (fieldName: string, maxCount: number) =>
+  upload.array(fieldName, maxCount);
+export const fieldImageUploads = (
+  fields: Array<{ name: string; maxCount: number }>
+) => upload.fields(fields);

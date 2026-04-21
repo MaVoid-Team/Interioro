@@ -10,6 +10,7 @@
         "products": "Products",
         "bundles": "Bundles",
         "categories": "Categories",
+        "designServices": "Design Services",
         "orders": "My Orders",
         "search": "Search",
         "cart": "Cart",
@@ -86,6 +87,7 @@
         "home": "Home",
         "products": "Products",
         "categories": "Categories",
+        "designServices": "Design Services",
         "profile": "Profile"
     },
     "Auth": {
@@ -633,6 +635,10 @@
         "productTypes": "Product Types",
         "locations": "Locations",
         "promoCodes": "Promo Codes",
+        "portfolio": "Portfolio",
+        "customRequests": "Custom Requests",
+        "specialPieces": "Special Pieces",
+        "consultations": "Consultations",
         "analytics": "Analytics",
         "login": "Login",
         "logout": "Logout",

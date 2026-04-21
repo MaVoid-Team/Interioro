@@ -16,11 +16,14 @@ import {
     ChevronLeft,
     ChevronRight,
     Menu,
-    X,
     Home,
     BarChart3,
     MapPin,
     TicketPercent,
+    Image,
+    FileText,
+    Star,
+    CalendarDays,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -44,15 +47,170 @@ interface NavItem {
     href: string
     label: string
     icon: React.ComponentType<{ className?: string }>
-    external?: boolean
     onClick?: () => void
 }
 
-interface AdminSidebarProps {
-    locale?: string
+interface AdminSidebarNavLinkProps {
+    item: NavItem
+    showLabel?: boolean
+    isRtl: boolean
+    isActive: (href: string) => boolean
+    onNavigate: () => void
 }
 
-export function AdminSidebar({ locale }: AdminSidebarProps) {
+function AdminSidebarNavLink({
+    item,
+    showLabel = true,
+    isRtl,
+    isActive,
+    onNavigate,
+}: AdminSidebarNavLinkProps) {
+    const active = isActive(item.href)
+    const Icon = item.icon
+
+    const linkContent = item.onClick ? (
+        <button
+            onClick={() => {
+                item.onClick?.()
+                onNavigate()
+            }}
+            className={cn(
+                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                "hover:bg-primary hover:text-sidebar-primary-foreground",
+                "text-sidebar-foreground",
+                !showLabel && "justify-center px-2",
+                isRtl && showLabel && "flex-row-reverse text-right"
+            )}
+        >
+            <Icon className="h-5 w-5 shrink-0" />
+            {showLabel && <span className="truncate">{item.label}</span>}
+        </button>
+    ) : (
+        <Link
+            href={item.href}
+            onClick={onNavigate}
+            className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                "hover:bg-primary hover:text-sidebar-primary-foreground",
+                active
+                    ? "bg-accent text-sidebar-accent-foreground shadow-sm"
+                    : "text-sidebar-foreground",
+                !showLabel && "justify-center px-2",
+                isRtl && showLabel && "flex-row-reverse text-right"
+            )}
+        >
+            <Icon className="h-5 w-5 shrink-0" />
+            {showLabel && <span className="truncate">{item.label}</span>}
+        </Link>
+    )
+
+    if (!showLabel) {
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+                <TooltipContent side="right" className="font-medium bg-popover text-popover-foreground border-border">
+                    {item.label}
+                </TooltipContent>
+            </Tooltip>
+        )
+    }
+
+    return linkContent
+}
+
+interface AdminSidebarContentProps {
+    collapsed?: boolean
+    isRtl: boolean
+    title: string
+    mainNavItems: NavItem[]
+    secondaryNavItems: NavItem[]
+    isActive: (href: string) => boolean
+    onNavigate: () => void
+}
+
+function AdminSidebarContent({
+    collapsed = false,
+    isRtl,
+    title,
+    mainNavItems,
+    secondaryNavItems,
+    isActive,
+    onNavigate,
+}: AdminSidebarContentProps) {
+    return (
+        <div className="flex h-full flex-col">
+            <div
+                className={cn(
+                    "flex h-16 items-center border-b border-sidebar-border px-4",
+                    collapsed ? "justify-center" : isRtl ? "justify-end" : "justify-start"
+                )}
+            >
+                {!collapsed ? (
+                    <h2 className={cn("text-lg font-semibold text-sidebar-foreground", isRtl && "text-right")}>
+                        {title}
+                    </h2>
+                ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                        <span className="text-sm font-bold text-primary">A</span>
+                    </div>
+                )}
+            </div>
+
+            <nav
+                className={cn(
+                    "flex-1 space-y-1 overflow-y-auto p-3",
+                    isRtl && !collapsed && "ps-8",
+                    isRtl && collapsed && "ps-3"
+                )}
+            >
+                <TooltipProvider delayDuration={0}>
+                    <div className="space-y-1">
+                        {mainNavItems.map((item) => (
+                            <AdminSidebarNavLink
+                                key={item.href}
+                                item={item}
+                                showLabel={!collapsed}
+                                isRtl={isRtl}
+                                isActive={isActive}
+                                onNavigate={onNavigate}
+                            />
+                        ))}
+                    </div>
+
+                    <Separator className="my-4 bg-sidebar-border" />
+
+                    <div className="space-y-1">
+                        {secondaryNavItems.map((item) => (
+                            <AdminSidebarNavLink
+                                key={`${item.href}-${item.label}`}
+                                item={item}
+                                showLabel={!collapsed}
+                                isRtl={isRtl}
+                                isActive={isActive}
+                                onNavigate={onNavigate}
+                            />
+                        ))}
+                    </div>
+                </TooltipProvider>
+            </nav>
+
+            <div
+                className={cn(
+                    "border-t border-sidebar-border p-4",
+                    collapsed && "flex justify-center"
+                )}
+            >
+                {!collapsed && (
+                    <p className={cn("text-xs text-muted-foreground", isRtl && "text-right")}>
+                        © {new Date().getFullYear()} Interioro
+                    </p>
+                )}
+            </div>
+        </div>
+    )
+}
+
+export function AdminSidebar() {
     const t = useTranslations("AdminSidebar")
     const currentLocale = useLocale()
     const isRtl = currentLocale === "ar"
@@ -74,162 +232,30 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
         { href: "/admin/product-types", label: t("productTypes"), icon: Package },
         { href: "/admin/locations", label: t("locations"), icon: MapPin },
         { href: "/admin/promo", label: t("promoCodes"), icon: TicketPercent },
+        { href: "/admin/portfolio", label: t("portfolio"), icon: Image },
+        { href: "/admin/custom-requests", label: t("customRequests"), icon: FileText },
+        { href: "/admin/special-pieces", label: t("specialPieces"), icon: Star },
+        { href: "/admin/consultations", label: t("consultations"), icon: CalendarDays },
     ]
 
     const secondaryNavItems: NavItem[] = [
         { href: "/", label: t("backToStore"), icon: Store },
+        { href: "#", label: t("logout"), icon: LogOut, onClick: logout },
     ]
 
-    const isActive = (href: string) => {
+    const isActive = React.useCallback((href: string) => {
         if (href === "/admin") {
             return pathname === "/admin"
         }
         return pathname.startsWith(href)
-    }
+    }, [pathname])
 
-    const NavLink = ({
-        item,
-        showLabel = true,
-    }: {
-        item: NavItem
-        showLabel?: boolean
-    }) => {
-        const active = isActive(item.href)
-        const Icon = item.icon
-
-        const linkContent = item.onClick ? (
-            <button
-                onClick={() => {
-                    item.onClick?.()
-                    setIsMobileOpen(false)
-                }}
-                className={cn(
-                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                    "hover:bg-primary hover:text-sidebar-primary-foreground",
-                    "text-sidebar-foreground",
-                    !showLabel && "justify-center px-2",
-                    isRtl && showLabel && "flex-row-reverse text-right"
-                )}
-            >
-                <Icon className={cn("h-5 w-5 shrink-0")} />
-                {showLabel && <span className="truncate">{item.label}</span>}
-            </button>
-        ) : (
-            <Link
-                href={item.href}
-                onClick={() => setIsMobileOpen(false)}
-                className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                    "hover:bg-primary hover:text-sidebar-primary-foreground",
-                    active
-                        ? "bg-accent text-sidebar-accent-foreground shadow-sm"
-                        : "text-sidebar-foreground",
-                    !showLabel && "justify-center px-2",
-                    isRtl && showLabel && "flex-row-reverse text-right"
-                )}
-            >
-                <Icon className={cn("h-5 w-5 shrink-0")} />
-                {showLabel && <span className="truncate">{item.label}</span>}
-            </Link>
-        )
-
-        if (!showLabel) {
-            return (
-                <Tooltip>
-                    <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium bg-popover text-popover-foreground border-border">
-                        {item.label}
-                    </TooltipContent>
-                </Tooltip>
-            )
-        }
-
-        return linkContent
-    }
-
-    const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => (
-        <div className="flex h-full flex-col">
-            {/* Header */}
-            <div
-                className={cn(
-                    "flex h-16 items-center border-b border-sidebar-border px-4",
-                    collapsed ? "justify-center" : isRtl ? "justify-end" : "justify-start"
-                )}
-            >
-                {!collapsed ? (
-                    <h2 className={cn("text-lg font-semibold text-sidebar-foreground", isRtl && "text-right")}>
-                        {t("adminPanel")}
-                    </h2>
-                ) : (
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-primary">A</span>
-                    </div>
-                )}
-            </div>
-
-            {/* Navigation */}
-            <nav className={cn(
-                "flex-1 space-y-1 overflow-y-auto p-3",
-                isRtl && !collapsed && "ps-8",
-                isRtl && collapsed && "ps-3"
-            )}>
-                <TooltipProvider delayDuration={0}>
-                    {/* Main Navigation */}
-                    <div className="space-y-1">
-                        {mainNavItems.map((item) => (
-                            <NavLink
-                                key={item.href}
-                                item={item}
-                                showLabel={!collapsed}
-                            />
-                        ))}
-                    </div>
-
-                    <Separator className="my-4 bg-sidebar-border" />
-
-                    {/* Secondary Navigation */}
-                    <div className="space-y-1">
-                        {secondaryNavItems.map((item) => (
-                            <NavLink
-                                key={item.href}
-                                item={item}
-                                showLabel={!collapsed}
-                            />
-                        ))}
-
-                        {/* Logout Button */}
-                        <NavLink
-                            item={{
-                                href: "#",
-                                label: t("logout"),
-                                icon: LogOut,
-                                onClick: logout
-                            }}
-                            showLabel={!collapsed}
-                        />
-                    </div>
-                </TooltipProvider>
-            </nav>
-
-            {/* Footer */}
-            <div
-                className={cn(
-                    "border-t border-sidebar-border p-4",
-                    collapsed && "flex justify-center"
-                )}
-            >
-                {!collapsed && (
-                    <p className={cn("text-xs text-muted-foreground", isRtl && "text-right")}>
-                        © {new Date().getFullYear()} Interioro
-                    </p>
-                )}
-            </div>
-        </div>
-    )
+    const closeMobileMenu = React.useCallback(() => {
+        setIsMobileOpen(false)
+    }, [])
 
     return (
         <>
-            {/* Mobile Trigger Button */}
             <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                 <SheetTrigger asChild>
                     <Button
@@ -248,20 +274,33 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
                     <SheetHeader className="sr-only">
                         <SheetTitle>{t("adminPanel")}</SheetTitle>
                     </SheetHeader>
-                    <SidebarContent />
+                    <AdminSidebarContent
+                        isRtl={isRtl}
+                        title={t("adminPanel")}
+                        mainNavItems={mainNavItems}
+                        secondaryNavItems={secondaryNavItems}
+                        isActive={isActive}
+                        onNavigate={closeMobileMenu}
+                    />
                 </SheetContent>
             </Sheet>
 
-            {/* Desktop Sidebar */}
             <aside
                 className={cn(
                     "fixed inset-y-0 start-0 z-40 hidden lg:flex flex-col bg-sidebar border-e border-sidebar-border transition-all duration-300 ease-in-out",
                     isCollapsed ? "w-16" : "w-64"
                 )}
             >
-                <SidebarContent collapsed={isCollapsed} />
+                <AdminSidebarContent
+                    collapsed={isCollapsed}
+                    isRtl={isRtl}
+                    title={t("adminPanel")}
+                    mainNavItems={mainNavItems}
+                    secondaryNavItems={secondaryNavItems}
+                    isActive={isActive}
+                    onNavigate={closeMobileMenu}
+                />
 
-                {/* Floating Toggle Button on Sidebar Edge */}
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -293,7 +332,6 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
                 </TooltipProvider>
             </aside>
 
-            {/* Spacer to push content */}
             <div
                 className={cn(
                     "hidden lg:block shrink-0 transition-all duration-300 ease-in-out",
