@@ -157,7 +157,11 @@
         "category": "Category",
         "categoryId": "Category ID",
         "productType": "Product Type",
-        "typeId": "Type ID"
+        "typeId": "Type ID",
+        "curatorNoteTitle": "Curator's Note",
+        "curatorNoteText": "A timeless addition to any curated space, blending organic form with refined function.",
+        "noSpecifications": "No technical specifications available for this piece.",
+        "adding": "Adding..."
     },
     "ProductsPage": {
         "title": "All Products",

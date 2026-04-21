@@ -42,6 +42,7 @@ export default function ProductPage() {
     const router = useRouter()
     const t = useTranslations('ProductPage')
     const tProducts = useTranslations('Products')
+    const tCommon = useTranslations('Common')
     const { addToCart, isAdding } = useCart()
     const { manufacturers } = useManufacturers()
     const { fetchPublicProductById } = useProducts()
@@ -192,9 +193,9 @@ export default function ProductPage() {
                             </div>
                         )}
                         <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-black/45 p-3 text-white/90 backdrop-blur-md pointer-events-none sm:inset-x-6 sm:bottom-6 sm:p-5 lg:inset-x-8 lg:bottom-8 lg:rounded-3xl lg:p-6">
-                            <p className="mb-1 text-xs font-medium italic opacity-80 sm:text-sm">Curator&apos;s Note</p>
+                            <p className="mb-1 text-xs font-medium italic opacity-80 sm:text-sm">{t('curatorNoteTitle')}</p>
                             <p className="line-clamp-3 text-sm font-serif leading-tight sm:text-base lg:text-lg">
-                                A timeless addition to any curated space, blending organic form with refined function.
+                                {t('curatorNoteText')}
                             </p>
                         </div>
                     </div>
@@ -229,7 +230,7 @@ export default function ProductPage() {
                         </div>
 
                         <div className="text-3xl font-serif font-bold text-primary sm:text-4xl md:text-5xl">
-                            {tProducts('currency')} {parseFloat(product.price).toFixed(2)}
+                            {tCommon('currency')} {parseFloat(product.price).toFixed(2)}
                         </div>
                     </div>
 
@@ -251,7 +252,7 @@ export default function ProductPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-muted-foreground text-sm italic">No technical specifications available for this piece.</p>
+                                <p className="text-muted-foreground text-sm italic">{t('noSpecifications')}</p>
                             )}
                         </div>
 
@@ -265,7 +266,7 @@ export default function ProductPage() {
                                 {isAdding ? (
                                     <div className="flex items-center gap-2">
                                         <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>Adding...</span>
+                                        <span>{t('adding')}</span>
                                     </div>
                                 ) : (
                                     <>
